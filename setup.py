@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 from setuptools import setup
 
-setup(name='provstore-api',
-    version='0.1.3',
-    description='ProvStore API client',
-    author='Sam Millar',
-    author_email='sam@millar.io',
-    url='https://github.com/millar/provstore-api',
+setup(name='provneo4j-api',
+    version='0.0.1',
+    description='Neo4J Prov API client',
+    author='Sam Millar, Stefan Bieliauskas',
+    author_email='sam@millar.io, sb@conts.e',
+    url='https://github.com/DLR-SC/provneo4j-api',
     packages=['provstore'],
     install_requires=[
         'prov>=1.0.0',
-        'requests'
+        'requests',
+        'neo4jrestclient'
     ],
     license="MIT",
     test_suite='provstore.tests',
