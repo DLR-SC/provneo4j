@@ -25,6 +25,7 @@ class Api(object):
                  username=None,
                  api_key=None,
                  base_url=None):
+        self.base_url = base_url
         self._connector = Neo4J()
         self._connector.connect(base_url=base_url, username=username, user_password=api_key)
 
@@ -56,14 +57,18 @@ class Api(object):
         else:
             raise Exception("Not supported format ")
 
-        return self._connector.post_document(prov_document,name)
+        doc_id = self._connector.post_document(prov_document,name)
+
+        for bundle in prov_document.bundles:
+            print self._connector.add_bundle(doc_id,bundle,bundle.identifier)
+
 
 
 
     def add_bundle(self, document_id, prov_bundle, identifier):
 
-        raise NotImplementedException()
-
+        prov_document = ProvDocument.deserialize(content=prov_bundle)
+        return self._connector.add_bundle(document_id,prov_document, identifier)
 
     def get_bundles(self, document_id):
 
@@ -74,6 +79,4 @@ class Api(object):
         raise NotImplementedException()
 
     def delete_document(self, document_id):
-
-        raise NotImplementedException()
-        return True
+        return self._connector.delete_doc(document_id)

@@ -139,5 +139,9 @@ class Neo4J(Connector):
         self._connection.query(q=DOC_DELETE_BY_ID % document_id)
         return True
 
-
+    def add_bundle(self, document_id, bundle_document, identifier):
+        bundle_doc_id = self.post_document(bundle_document, identifier)
+        doc = self._connection.nodes.get(document_id)
+        bundles_ids = doc.get('bundles', '')
+        doc.set("bundles", bundles_ids + ",%i" % bundle_doc_id)
 
