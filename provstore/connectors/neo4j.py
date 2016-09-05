@@ -60,16 +60,6 @@ class Neo4J(Connector):
         n.labels.add(str(node.label))
         properties =  dict(map(lambda (key, value): (str(key), str(value)), node.attributes))
 
-        #add namespace
-        namespace = node.label.namespace
-        if namespace is None:
-            raise InvalidDataException("every node need a namespace the node " + node.label + " has no namespace")
-
-        properties.update({
-            "namespace:uri": namespace.uri,
-            "namespace:prefix": namespace.prefix
-        })
-        print properties
         n.properties = properties
 
         return n
@@ -90,6 +80,17 @@ class Neo4J(Connector):
 
         db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
+    def _add_meta_data_to_node(self,db_node,graph_node, id):
+
+        # add namespace
+        namespace = graph_node.label.namespace
+        if namespace is None:
+            raise InvalidDataException("every node need a namespace the node " + graph_node.label + " has no namespace")
+
+        db_node.set("namespace:uri",namespace.uri)
+        db_node.set("namespace:prefix",namespace.prefix)
+        db_node.set("document:id",id)
+
     def post_document(self, prov_document,name=None):
         # creates a database entry from a prov-n document
         # returns the saved neo4J doc
@@ -107,6 +108,10 @@ class Neo4J(Connector):
         for node in g.nodes():
             db_nodes[node] = self._create_node(node)
 
+        if len(g.nodes()) is not 0:
+            #document node
+            doc_node = db_nodes.values()[0]
+
         # Begin transaction for relations
         with gdb.transaction() as tx:
             # Create relations
@@ -116,4 +121,7 @@ class Neo4J(Connector):
                 for key, relation in relations.iteritems():
                     self._create_relation(db_nodes,from_node,to_node,relation)
 
-        return None
+            for graph_node,db_node in db_nodes.iteritems():
+                self._add_meta_data_to_node(db_node,graph_node,doc_node.id)
+
+        return doc_node.id
