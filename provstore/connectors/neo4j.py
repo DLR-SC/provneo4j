@@ -10,6 +10,10 @@ from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.constants import PROV_N_MAP
 from prov.graph import prov_to_graph
 
+
+DOC_QUERY_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i RETURN d"
+DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
+
 from connector import *
 
 
@@ -83,7 +87,7 @@ class Neo4J(Connector):
     def _add_meta_data_to_node(self,db_node,graph_node, id):
 
         # add namespace
-        namespace = graph_node.label.namespace
+        namespace = graph_node.identifier.namespace
         if namespace is None:
             raise InvalidDataException("every node need a namespace the node " + graph_node.label + " has no namespace")
 
@@ -104,13 +108,18 @@ class Neo4J(Connector):
         # store all database nodes in dict
         db_nodes = {}
 
+        nodes = g.nodes()
+        if len(nodes) is 0:
+            nodes = prov_document.get_records()
         # Create nodes
-        for node in g.nodes():
+        for node in nodes:
             db_nodes[node] = self._create_node(node)
 
-        if len(g.nodes()) is not 0:
+        if len(nodes) is not 0:
             #document node
             doc_node = db_nodes.values()[0]
+        else:
+            raise InvalidDataException("Please provide a document with at least one node")
 
         # Begin transaction for relations
         with gdb.transaction() as tx:
@@ -121,7 +130,14 @@ class Neo4J(Connector):
                 for key, relation in relations.iteritems():
                     self._create_relation(db_nodes,from_node,to_node,relation)
 
-            for graph_node,db_node in db_nodes.iteritems():
-                self._add_meta_data_to_node(db_node,graph_node,doc_node.id)
+        for graph_node,db_node in db_nodes.iteritems():
+            self._add_meta_data_to_node(db_node,graph_node,doc_node.id)
 
         return doc_node.id
+
+    def delete_doc(self,document_id):
+        self._connection.query(q=DOC_DELETE_BY_ID % document_id)
+        return True
+
+
+
