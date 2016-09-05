@@ -7,14 +7,14 @@ from provstore.document import AbstractDocumentException, ImmutableDocumentExcep
 import provstore.tests.examples as examples
 
 
-PROVSTORE_USERNAME = os.environ.get('PROVSTORE_USERNAME', 'provstore-api-test')
-PROVSTORE_API_KEY = os.environ.get('PROVSTORE_API_KEY', '56f7db0b9f1651d2cb0dd9b11c53b5fdc2dcacf4')
-
+NEO4J_USERNAME = os.environ.get('PROVSTORE_USERNAME', 'neo4j')
+NEO4J_API_KEY = os.environ.get('PROVSTORE_API_KEY', 'neo4jneo4j')#Password
+NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://192.168.99.100:32769/db/data/')
 
 class LoggedInAPITestMixin(object):
     @classmethod
     def setUpClass(cls):
-        cls.api = Api(username=PROVSTORE_USERNAME, api_key=PROVSTORE_API_KEY)
+        cls.api = Api(base_url=NEO4J_BASE_URL,username=NEO4J_USERNAME, api_key=NEO4J_API_KEY)
         return super(LoggedInAPITestMixin, cls).setUpClass()
 
 
@@ -29,6 +29,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 
         stored_document.delete()
 
+    @unittest.skip("Not supported with neo4J")
     def test_diff_auth_access(self):
         prov_document = examples.flat_document()
 
@@ -213,6 +214,8 @@ class ProvStoreConfigAPITests(unittest.TestCase):
             api = Api(username="millar", api_key="bad")
             api.document.get(148)
 
+    @unittest.skip("Not supported with neo4J")
+    #https://github.com/travis-ci/travis-ci/issues/3243
     def test_public_access(self):
         api = Api()
         stored_document = api.document.get(148)
