@@ -89,7 +89,7 @@ class Document(object):
             prov_format = "json"
             prov_document = prov_document.serialize()
 
-        self._id = self._api.post_document(prov_document, prov_format, **props)['id']
+        self._id = self._api.post_document(prov_document, prov_format, **props)
 
         if refresh:
             self.refresh()
