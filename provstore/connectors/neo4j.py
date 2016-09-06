@@ -65,10 +65,11 @@ class Neo4J(Connector):
         # see: http://networkx.readthedocs.io/en/networkx-1.10/reference/classes.multidigraph.html
 
         n = self._connection.nodes.create()
-        n.labels.add(str(node.label))
+        n.labels.add(str(node.get_type()))
         properties =  dict(map(lambda (key, value): (str(key), str(value)), node.attributes))
 
         n.properties = properties
+        n.set("label", (str(node.label)))
 
         return n
 
