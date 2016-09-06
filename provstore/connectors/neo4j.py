@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from copy import copy
-from prov.model import ProvDocument, QualifiedName, Namespace
+from prov.model import ProvDocument, QualifiedName, Namespace,ProvBundle,ProvElement
 from provstore.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES
@@ -21,6 +21,8 @@ DOC_PROPERTY_NAME_NAMESPACE_PREFIX = "namespace:prefix"
 DOC_QUERY_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i RETURN d"
 DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
 
+BUNDLE_LABEL_NAME= "prov:Bundle"
+BUNDLE_RELATION_NAME = "includeIn"
 
 class Neo4J(Connector):
     _base_url = None
@@ -61,16 +63,20 @@ class Neo4J(Connector):
                 raise e
 
     def _create_node(self,node):
-        # node is a MulitDiGrpah.Node
+        # node is a MulitDiGrpah.Node / ProvRecord
         # see: http://networkx.readthedocs.io/en/networkx-1.10/reference/classes.multidigraph.html
 
         n = self._connection.nodes.create()
-        n.labels.add(str(node.get_type()))
-        properties =  dict(map(lambda (key, value): (str(key), str(value)), node.attributes))
 
-        n.properties = properties
-        n.set("label", (str(node.label)))
+        if isinstance(node,ProvBundle):
+            n.labels.add(BUNDLE_LABEL_NAME)
+        elif isinstance(node,ProvElement):
+            n.labels.add(str(node.get_type()))
+            n.properties = dict(map(lambda (key, value): (str(key), str(value)), node.attributes))
+        else:
+            raise InvalidDataException("Not supportet node class you passed %s " %type(node))
 
+        n.set("label", (str(node.identifier)))
         return n
 
     def _create_relation(self,db_nodes,from_node,to_node,relation):
@@ -89,16 +95,22 @@ class Neo4J(Connector):
 
         db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
-    def _add_meta_data_to_node(self,db_node,graph_node, id):
+    def _create_bundle_relation(self, db_nodes, from_node, to_bundle):
+        db_to_bundle = db_nodes[to_bundle.identifier]
+        db_from_node = db_nodes[from_node]
+        db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle )
+
+        pass
+    def _add_meta_data_to_node(self,db_node,identifier, doc_id):
 
         # add namespace
-        if isinstance(graph_node.identifier,QualifiedName)and isinstance(graph_node.identifier.namespace,Namespace):
+        if isinstance(identifier,QualifiedName)and isinstance(identifier.namespace,Namespace):
 
-            namespace = graph_node.identifier.namespace
+            namespace = identifier.namespace
             db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,namespace.uri)
             db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,namespace.prefix)
 
-        db_node.set(DOC_PROPERTY_NAME_ID,id)
+        db_node.set(DOC_PROPERTY_NAME_ID,doc_id)
 
     def post_document(self, prov_document,name=None):
         # creates a database entry from a prov-n document
@@ -116,9 +128,12 @@ class Neo4J(Connector):
         nodes = g.nodes()
         if len(nodes) is 0:
             nodes = prov_document.get_records()
-        # Create nodes
+        # Create nodes / for prov
         for node in nodes:
             db_nodes[node] = self._create_node(node)
+        # Create nodes for bundles
+        for bundle in prov_document.bundles:
+            db_nodes[bundle.identifier] = self._create_node(bundle)
 
         if len(nodes) is not 0:
             #document node
@@ -128,15 +143,27 @@ class Neo4J(Connector):
 
         # Begin transaction for relations
         with gdb.transaction() as tx:
-            # Create relations
+            # Create relations between nodes
             for from_node, to_node, relations in g.edges_iter(data=True):
 
                 # interate over relations (usually only one item)
                 for key, relation in relations.iteritems():
                     self._create_relation(db_nodes,from_node,to_node,relation)
 
+            #Create relation to the bundle node
+            for bundle in prov_document.bundles:
+                for record in bundle.get_records(ProvElement):
+                    self._create_bundle_relation(db_nodes, record, bundle)
+
+
+        #Add meta data to each node
         for graph_node,db_node in db_nodes.iteritems():
-            self._add_meta_data_to_node(db_node,graph_node,doc_node.id)
+            if type(graph_node) is QualifiedName:
+                self._add_meta_data_to_node(db_node,graph_node,doc_node.id)
+            elif isinstance(graph_node,ProvElement):
+                self._add_meta_data_to_node(db_node,graph_node.identifier,doc_node.id)
+            else:
+                raise InvalidDataException("unknown type: %s" %type(graph_node))
 
         return doc_node.id
 
