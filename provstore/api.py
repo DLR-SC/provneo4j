@@ -43,7 +43,7 @@ class Api(object):
         return Document(self)
 
     def get_document_prov(self, document_id, prov_format=ProvDocument):
-        raise NotImplementedException()
+        self._connector.get_document(document_id,prov_format)
 
 
     def get_document_meta(self, document_id):
@@ -62,6 +62,7 @@ class Api(object):
         for bundle in prov_document.bundles:
             print self._connector.add_bundle(doc_id,bundle,bundle.identifier)
 
+        return doc_id
 
 
 

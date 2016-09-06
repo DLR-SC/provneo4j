@@ -18,7 +18,7 @@ DOC_PROPERTY_NAME_BUNDLES = "document:bundles"
 DOC_PROPERTY_NAME_NAMESPACE_URI = "namespace:uri"
 DOC_PROPERTY_NAME_NAMESPACE_PREFIX = "namespace:prefix"
 
-DOC_QUERY_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i RETURN d"
+DOC_GET_DOC_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i RETURN d"
 DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
 
 
@@ -99,6 +99,14 @@ class Neo4J(Connector):
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,namespace.prefix)
         db_node.set(DOC_PROPERTY_NAME_ID,id)
 
+    def get_document(self,document_id,prov_format):
+        results = self._connection.query(q=DOC_GET_DOC_BY_ID % document_id)
+        for item in results:
+            print item
+        if prov_format is ProvDocument:
+            return ProvDocument()
+        else:
+            raise NotImplementedException("Neo4j connector only supports ProvDocument format during the get request")
     def post_document(self, prov_document,name=None):
         # creates a database entry from a prov-n document
         # returns the saved neo4J doc
@@ -145,8 +153,32 @@ class Neo4J(Connector):
 
     def add_bundle(self, document_id, bundle_document, identifier):
         bundle_doc_id = self.post_document(bundle_document, identifier)
+
+        #Set bundle ids to document
         doc = self._connection.nodes.get(document_id)
         bundles_ids = doc.get(DOC_PROPERTY_NAME_BUNDLES, list())
         bundles_ids.append(bundle_doc_id)
         doc.set(DOC_PROPERTY_NAME_BUNDLES, bundles_ids)
+
+        #create Linking Across Provenance Bundles
+        #https://www.w3.org/TR/2013/NOTE-prov-links-20130430/
+
+
+        print "start"
+        g = prov_to_graph(bundle_document)
+
+
+        for from_node, to_node, relations in g.edges_iter(data=True):
+            for key,relation in relations.iteritems():
+                print PROV_N_MAP[relation.get_type()]
+                print relation.get_type()
+                if relation.get_type() is PROV['Mention']:
+                    print "yes"
+
+
+        print "end"
+
+
+
+
 
