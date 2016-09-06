@@ -2,13 +2,13 @@ import os
 import json
 import requests
 from copy import copy
-from prov.model import ProvDocument
+from prov.model import ProvDocument, QualifiedName, Namespace
 from provstore.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.constants import PROV_N_MAP
-from prov.graph import prov_to_graph
+from provstore.prov_to_graph import prov_to_graph_flattern
 from connector import *
 
 
@@ -92,12 +92,12 @@ class Neo4J(Connector):
     def _add_meta_data_to_node(self,db_node,graph_node, id):
 
         # add namespace
-        namespace = graph_node.identifier.namespace
-        if namespace is None:
-            raise InvalidDataException("every node need a namespace the node " + graph_node.label + " has no namespace")
+        if isinstance(graph_node.identifier,QualifiedName)and isinstance(graph_node.identifier.namespace,Namespace):
 
-        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,namespace.uri)
-        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,namespace.prefix)
+            namespace = graph_node.identifier.namespace
+            db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,namespace.uri)
+            db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,namespace.prefix)
+
         db_node.set(DOC_PROPERTY_NAME_ID,id)
 
     def post_document(self, prov_document,name=None):
@@ -108,7 +108,7 @@ class Neo4J(Connector):
         gdb = self._connection
 
         # create graph from prov doc
-        g = prov_to_graph(prov_document)
+        g = prov_to_graph_flattern(prov_document)
 
         # store all database nodes in dict
         db_nodes = {}

@@ -57,10 +57,7 @@ class Api(object):
         else:
             raise Exception("Not supported format ")
 
-        doc_id = self._connector.post_document(prov_document,name)
-
-        for bundle in prov_document.bundles:
-            print self._connector.add_bundle(doc_id,bundle,bundle.identifier)
+        return self._connector.post_document(prov_document,name)
 
 
 
