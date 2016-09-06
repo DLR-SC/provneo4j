@@ -9,13 +9,17 @@ from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.constants import PROV_N_MAP
 from prov.graph import prov_to_graph
+from connector import *
 
+
+
+DOC_PROPERTY_NAME_ID = "document:id"
+DOC_PROPERTY_NAME_BUNDLES = "document:bundles"
+DOC_PROPERTY_NAME_NAMESPACE_URI = "namespace:uri"
+DOC_PROPERTY_NAME_NAMESPACE_PREFIX = "namespace:prefix"
 
 DOC_QUERY_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i RETURN d"
 DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
-
-from connector import *
-
 
 
 class Neo4J(Connector):
@@ -91,9 +95,9 @@ class Neo4J(Connector):
         if namespace is None:
             raise InvalidDataException("every node need a namespace the node " + graph_node.label + " has no namespace")
 
-        db_node.set("namespace:uri",namespace.uri)
-        db_node.set("namespace:prefix",namespace.prefix)
-        db_node.set("document:id",id)
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,namespace.uri)
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,namespace.prefix)
+        db_node.set(DOC_PROPERTY_NAME_ID,id)
 
     def post_document(self, prov_document,name=None):
         # creates a database entry from a prov-n document
@@ -142,7 +146,7 @@ class Neo4J(Connector):
     def add_bundle(self, document_id, bundle_document, identifier):
         bundle_doc_id = self.post_document(bundle_document, identifier)
         doc = self._connection.nodes.get(document_id)
-        bundles_ids = doc.get('bundles', list())
+        bundles_ids = doc.get(DOC_PROPERTY_NAME_BUNDLES, list())
         bundles_ids.append(bundle_doc_id)
-        doc.set("bundles", bundles_ids)
+        doc.set(DOC_PROPERTY_NAME_BUNDLES, bundles_ids)
 
