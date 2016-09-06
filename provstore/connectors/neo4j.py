@@ -142,6 +142,7 @@ class Neo4J(Connector):
     def add_bundle(self, document_id, bundle_document, identifier):
         bundle_doc_id = self.post_document(bundle_document, identifier)
         doc = self._connection.nodes.get(document_id)
-        bundles_ids = doc.get('bundles', '')
-        doc.set("bundles", bundles_ids + ",%i" % bundle_doc_id)
+        bundles_ids = doc.get('bundles', list())
+        bundles_ids.append(bundle_doc_id)
+        doc.set("bundles", bundles_ids)
 
