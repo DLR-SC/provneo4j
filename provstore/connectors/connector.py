@@ -36,13 +36,19 @@ class DocumentInvalidException(ConnectorException):
 class NotImplementedException(ConnectorException):
     pass
 
+class ProvDeserializerException(ConnectorException):
+    pass
+
+class ProvSerializerException(ConnectorException):
+    pass
+
 
 class Connector:
 
     def connect(self):
         raise NotImplementedError("Please implement the method 'connect' in your connector class")
 
-    def _create_node(self,node):
+    def _create_db_node(self, node):
         raise NotImplementedError("Please implement the method '_create_node' in your connector class")
 
     def _create_relation(self,db_nodes, from_node, to_node, relation):
@@ -61,7 +67,7 @@ class Connector:
 
         # Create nodes
         for node in g.nodes():
-            db_nodes[node] = self._create_node(node)
+            db_nodes[node] = self._create_db_node(node)
 
 
         # Create relations

@@ -29,6 +29,19 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 
         stored_document.delete()
 
+    def test_basic_get(self):
+        prov_document = examples.flat_document()
+        prov_document.entity("ex:string", other_attributes={"ex:name":"test"})
+        prov_document.entity("ex:date",other_attributes={"ex:date":datetime.datetime.now()})
+        prov_document.wasAssociatedWith('ex:string', 'ex:date')
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
+
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        stored_document.delete()
+
     @unittest.skip("Not supported with neo4J")
     def test_diff_auth_access(self):
         prov_document = examples.flat_document()
