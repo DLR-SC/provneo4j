@@ -1,26 +1,27 @@
-provstore-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provstore-api) [![Build Status](https://travis-ci.org/millar/provstore-api.svg?branch=master)](https://travis-ci.org/millar/provstore-api) [![Coverage Status](https://coveralls.io/repos/millar/provstore-api/badge.png)](https://coveralls.io/r/millar/provstore-api)
+provneo4j-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provstore-api) [![Build Status](https://travis-ci.org/millar/provstore-api.svg?branch=master)](https://travis-ci.org/millar/provstore-api) [![Coverage Status](https://coveralls.io/repos/millar/provstore-api/badge.png)](https://coveralls.io/r/millar/provstore-api)
 =========
 
-Client for the [ProvStore](https://provenance.ecs.soton.ac.uk/store/)'s [API](https://provenance.ecs.soton.ac.uk/store/help/api/).
+PROV Client for the [Neo4j](https://neo4j.com/) graph database 
+
+(based on [provstore-api](https://github.com/millar/provstore-api).)
 
 ## Installation
 ```bash
-pip install provstore-api
+pip install provneo4j-api
 ```
 
-You can view [provstore-api on PyPi's package index](https://pypi.python.org/pypi/provstore-api/)
+You can view [provneo4j-api on PyPi's package index](https://pypi.python.org/pypi/provneo4j-api/)
 ## Usage
 
 To use the client import the API and configure your access credentials:
 
 ```python
-from provstore.api import Api
+from provneo4j.api import Api
 
-# API key can be found at https://provenance.ecs.soton.ac.uk/store/account/developer/
-api = Api(userame="your_provstore_username", api_key="your_api_key")
+api = Api(userame="your_neo4j_username", password="your_api_key")
 ```
 
-*Note: credentials can also be set via the `PROVSTORE_USERNAME` and `PROVSTORE_API_KEY` environment variables and omitted from the initialization.*
+*Note: credentials can also be set via the `PROVNEO4J_USERNAME` and `PROVNEO4J_PASSWORD` environment variables and omitted from the initialization.*
 
 For demonstrations purposes we will use the ProvDocuments given in the examples
 module, but you would use your documents instead.
@@ -91,8 +92,8 @@ for bundle in api.document.get(148).bundles:
 
 ## Contribute
 
-- Issue Tracker: https://github.com/millar/provstore-api/issues
-- Source Code: https://github.com/millar/provstore-api
+- Issue Tracker: https://github.com/DLR-SC/provneo4j-api/issues
+- Source Code: https://github.com/DLR-SC/provneo4j-api
 
 ## Documentation
 
@@ -108,3 +109,4 @@ This project is licensed under the MIT license.
 ## Contributors
 
 Sam Millar &lt;http://millar.io&gt;
+Stefan Bieliauskas 
