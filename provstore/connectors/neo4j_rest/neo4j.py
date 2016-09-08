@@ -109,6 +109,7 @@ class Neo4J(Connector):
 
         #get single nodes without connections to any other node
         results = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+        #@todo find a faster way to get all nodes without connections (With one query I tried it already but the libary don't support NULL values as return values.
         for db_node in reduce(lambda x,y: x+y,results):
             deserializer.add_namespace(db_node, prov_document)
             all_records.update({int(db_node.id): deserializer.create_record(prov_document,db_node)})
