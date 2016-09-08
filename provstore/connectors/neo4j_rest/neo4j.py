@@ -96,6 +96,7 @@ class Neo4J(Connector):
         for db_from_node, db_relation, db_to_node in results:
             deserializer.add_namespace(db_from_node,prov_document)
             deserializer.add_namespace(db_to_node,prov_document)
+            deserializer.add_namespace(db_relation,prov_document)
 
             all_keys = all_records.keys()
             #Add records
