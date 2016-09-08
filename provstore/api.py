@@ -29,6 +29,7 @@ class Api(object):
         self.base_url = base_url
         self._connector = Neo4J()
         self._connector.connect(base_url=base_url, username=username, user_password=api_key)
+        self._username = username
 
     def __eq__(self, other):
         if not isinstance(other, Api):
