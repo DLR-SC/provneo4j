@@ -55,6 +55,18 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 
         stored_document.delete()
 
+    def test_primer_example_alternate(self):
+        prov_document = examples.primer_example_alternate()
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
+
+        prov_document = own_examples.reformat_example(prov_document)
+
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        stored_document.delete()
+
     @unittest.skip("Not supported with neo4J")
     def test_diff_auth_access(self):
         prov_document = own_examples.flat_document()
