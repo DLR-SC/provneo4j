@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from copy import copy
-from prov.model import ProvDocument, QualifiedName, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
+from prov.model import ProvDocument, QualifiedName,ProvRelation, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
 from provstore.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES,PROV_REC_CLS
@@ -139,7 +139,7 @@ class Neo4J(Connector):
 
                 # interate over relations (usually only one item)
                 for key, relation in relations.iteritems():
-                    serializer.create_relation(db_nodes,from_node,to_node,relation)
+                    db_nodes[relation] = serializer.create_relation(db_nodes,from_node,to_node,relation)
 
             #Create relation to the bundle node
             for bundle in prov_document.bundles:
@@ -150,11 +150,16 @@ class Neo4J(Connector):
         #Add meta data to each node
         for graph_node,db_node in db_nodes.iteritems():
             if type(graph_node) is QualifiedName:
-                serializer.add_meta_data_to_node(db_node,graph_node,doc_node.id)
+                serializer.add_id(db_node,doc_node.id)
             elif isinstance(graph_node,ProvElement):
-                serializer.add_meta_data_to_node(db_node,graph_node.identifier,doc_node.id)
+                serializer.add_id(db_node,doc_node.id)
+            elif isinstance(graph_node,ProvRelation):
+                #don't need to add document id to the realtions
+                pass
             else:
                 raise InvalidDataException("unknown type: %s" %type(graph_node))
+
+            serializer.add_namespaces(db_node,graph_node)
 
         return doc_node.id
 

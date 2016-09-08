@@ -7,6 +7,10 @@ from prov.constants import PROV_RECORD_IDS_MAP
 
 class Neo4JRestDeserializer(Deserializer):
 
+    def get_properties_without_meta_data(self,properties):
+        real_property_keys = set(properties.keys()) - set(DOC_PROPERTY_MAP)
+        return filter(lambda (key, value): key in real_property_keys, properties.iteritems())
+
     def create_record(self,bundle,db_record):
         jc = []
         #Get type from label
@@ -23,8 +27,8 @@ class Neo4JRestDeserializer(Deserializer):
 
         #Remove all metda-data from the properties
 
-        real_property_keys = set(db_record.properties.keys()) - set(DOC_PROPERTY_MAP)
-        properties = filter(lambda (key,value): key in real_property_keys, db_record.properties.iteritems())
+
+        properties = self.get_properties_without_meta_data(db_record.properties)
 
         #Get id for the node from the properties
         rec_id  = db_record.properties.get(DOC_PROPERTY_NAME_LABEL)
@@ -41,18 +45,21 @@ class Neo4JRestDeserializer(Deserializer):
             if rec_type is None:
                 raise InvalidDataException("No valid relation type provided the type was %s"%db_relation.type)
 
-        return Deserializer.create_prov_record(bundle, rec_type, None, db_relation.properties)
+        properties = self.get_properties_without_meta_data(db_relation.properties)
+
+        return Deserializer.create_prov_record(bundle, rec_type, None, properties)
 
 
     def add_namespace(self,db_node,prov_bundle):
-        prefix  = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_PREFIX]
-        uri = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_URI]
+        prefixes  = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_PREFIX]
+        uris = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_URI]
 
-        if prefix is not None and uri is not None:
-            if prefix != 'default':
-                prov_bundle.add_namespace(Namespace(prefix, uri))
+        for prefix,uri in zip(prefixes,uris):
+            if prefix is not None and uri is not None:
+                if prefix != 'default':
+                    prov_bundle.add_namespace(Namespace(prefix, uri))
+                else:
+                    prov_bundle.set_default_namespace(uri)
             else:
-                prov_bundle.set_default_namespace(uri)
-        else:
-            ProvDeserializerException("No valid namespace provided for the node: %s"%db_node)
+                ProvDeserializerException("No valid namespace provided for the node: %s"%db_node)
 

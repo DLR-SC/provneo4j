@@ -45,22 +45,32 @@ class Neo4jRestSerializer(Serializer):
         db_from_node = db_nodes[from_node]
         db_to_node = db_nodes[to_node]
 
-        db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
+        return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
 
     def create_bundle_relation(self, db_nodes, from_node, to_bundle):
         db_to_bundle = db_nodes[to_bundle.identifier]
         db_from_node = db_nodes[from_node]
-        db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle)
+        return db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle)
 
-        pass
+    def add_namespaces(self,db_node, prov_record):
+        used_namespaces={}
+        if isinstance(prov_record.identifier, QualifiedName):
+            namespace = prov_record.identifier.namespace
+            used_namespaces.update({str(namespace.prefix):namespace.uri})
+        else:
+           logger.info("Prov record %s has no identifier"%prov_record)
 
+        for key,value in prov_record.attributes:
+            if isinstance(key,QualifiedName):
+                namespace = key.namespace
+                used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
+            else:
+               raise ProvSerializerException("Not support key type %s"%type(key))
 
-    def add_meta_data_to_node(self, db_node, identifier, doc_id):
-        # add namespace
-        if isinstance(identifier, QualifiedName) and isinstance(identifier.namespace, Namespace):
-            namespace = identifier.namespace
-            db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI, namespace.uri)
-            db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX, namespace.prefix)
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
+
+    def add_id(self, db_node, doc_id):
 
         db_node.set(DOC_PROPERTY_NAME_ID, doc_id)
