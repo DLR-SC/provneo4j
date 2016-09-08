@@ -71,6 +71,11 @@ class Neo4jRestSerializer(Serializer):
             if isinstance(value, QualifiedName):
                 namespace = value.namespace
                 used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
+            else:
+                qualified_name = Serializer.valid_qualified_name(prov_record.bundle, value)
+                if qualified_name is not None:
+                    namespace = qualified_name.namespace
+                    used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
 
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
