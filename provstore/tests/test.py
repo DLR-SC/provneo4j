@@ -1,7 +1,7 @@
 import os
 import unittest
 import datetime
-
+from time import gmtime,strftime
 from provstore.api import Api, NotFoundException, InvalidCredentialsException, InvalidDataException, ForbiddenException
 from provstore.document import AbstractDocumentException, ImmutableDocumentException, EmptyDocumentException
 import provstore.tests.examples as examples
@@ -32,7 +32,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
     def test_basic_get(self):
         prov_document = examples.flat_document()
         prov_document.entity("ex:string", other_attributes={"ex:name":"test"})
-        prov_document.entity("ex:date",other_attributes={"ex:date":datetime.datetime.now()})
+        prov_document.entity("ex:date",other_attributes={"ex:date":strftime("%Y%m%dT%H%M%S%Z", gmtime())})
         prov_document.wasAssociatedWith('ex:string', 'ex:date')
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
