@@ -48,12 +48,6 @@ class Connector:
     def connect(self):
         raise NotImplementedError("Please implement the method 'connect' in your connector class")
 
-    def _create_db_node(self, node):
-        raise NotImplementedError("Please implement the method '_create_node' in your connector class")
-
-    def _create_relation(self,db_nodes, from_node, to_node, relation):
-        raise NotImplementedError("Please implement the method '_create_relation' in your connector class")
-
     def post_document(self,prov_document,name=None):
         # creates a database entry from a prov-n document
         # returns the saved neo4J doc

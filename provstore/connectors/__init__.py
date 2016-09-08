@@ -1,2 +1,2 @@
 from connector import *
-from neo4j import Neo4J
+from neo4j_rest import *

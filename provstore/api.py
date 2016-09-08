@@ -2,7 +2,8 @@ import os
 import json
 from prov.model import ProvDocument
 from provstore.document import Document
-from provstore.connectors import  *
+from provstore.connectors.neo4j_rest.neo4j import Neo4J
+from provstore.connectors.connector import *
 
 class Api(object):
     """
