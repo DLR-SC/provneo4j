@@ -106,7 +106,8 @@ class Neo4J(Connector):
         # creates a database entry from a prov-n document
         # returns the saved neo4J doc
         #
-
+        if len(name) == 0:
+            raise InvalidDataException("Please provide a name for the document")
         gdb = self._connection
 
         # create graph from prov doc
