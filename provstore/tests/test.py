@@ -43,10 +43,12 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
 
-    def test_prov_primer_example_storage(self):
+    def test_prov_primer_example(self):
         prov_document = examples.primer_example()
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
+
+        prov_document = own_examples.reformat_example(prov_document)
 
         query_document = stored_document.refresh()
         self.assertEqual(query_document.prov, prov_document)
