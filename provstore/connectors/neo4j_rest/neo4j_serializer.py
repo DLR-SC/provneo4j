@@ -68,6 +68,10 @@ class Neo4jRestSerializer(Serializer):
             else:
                raise ProvSerializerException("Not support key type %s"%type(key))
 
+            if isinstance(value, QualifiedName):
+                namespace = value.namespace
+                used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
+
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
 

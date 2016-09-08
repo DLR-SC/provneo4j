@@ -12,24 +12,30 @@ class Deserializer:
 
     @staticmethod
     def decode_json_representation(literal, bundle):
-        if isinstance(literal, dict):
-            # complex type
-            value = literal['$']
-            datatype = literal['type'] if 'type' in literal else None
-            datatype = Deserializer.valid_qualified_name(bundle, datatype)
-            langtag = literal['lang'] if 'lang' in literal else None
-            if datatype == XSD_ANYURI:
-                return Identifier(value)
-            elif datatype == PROV_QUALIFIEDNAME:
-                return Deserializer.valid_qualified_name(bundle, value)
-            else:
-                # The literal of standard Python types is not converted here
-                # It will be automatically converted when added to a record by
-                # _auto_literal_conversion()
-                return Literal(value, datatype, langtag)
-        else:
-            # simple type, just return it
-            return literal
+        qualified_name = Deserializer.valid_qualified_name(bundle,literal)
+        if qualified_name is not None:
+            return qualified_name
+        return literal
+
+        # #
+        # if isinstance(literal, dict):
+        #     # complex type
+        #     value = literal['$']
+        #     datatype = literal['type'] if 'type' in literal else None
+        #     datatype = Deserializer.valid_qualified_name(bundle, datatype)
+        #     langtag = literal['lang'] if 'lang' in literal else None
+        #     if datatype == XSD_ANYURI:
+        #         return Identifier(value)
+        #     elif datatype == PROV_QUALIFIEDNAME:
+        #         return Deserializer.valid_qualified_name(bundle, value)
+        #     else:
+        #         # The literal of standard Python types is not converted here
+        #         # It will be automatically converted when added to a record by
+        #         # _auto_literal_conversion()
+        #         return Literal(value, datatype, langtag)
+        # else:
+        #     # simple type, just return it
+        #     return literal
 
     @staticmethod
     def valid_qualified_name(bundle, value):
