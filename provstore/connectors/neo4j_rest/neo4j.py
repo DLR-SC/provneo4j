@@ -80,6 +80,9 @@ class Neo4J(Connector):
 
     def get_document(self,document_id,prov_format):
         results = self._connection.query(q=DOC_GET_DOC_BY_ID % document_id, returns=(Node, Relationship,Node))
+
+        if len(results) == 0:
+            raise NotFoundException("We can't find the document with the id %i" %document_id)
         prov_document = ProvDocument()
         all_records= {}
         deserializer = Neo4JRestDeserializer()
