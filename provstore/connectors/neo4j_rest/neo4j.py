@@ -26,7 +26,14 @@ DOC_PROPERTY_MAP = [DOC_PROPERTY_NAME_ID,
                     DOC_PROPERTY_NAME_NAMESPACE_PREFIX,
                     DOC_PROPERTY_NAME_LABEL]
 
-DOC_GET_DOC_BY_ID = "MATCH (d)-[r]-(x) WHERE (d.`document:id`)=%i RETURN d, r, x"
+DOC_GET_DOC_BY_ID = """ MATCH (d)-[r]-(x) WHERE (d.`document:id`)=%i
+                        RETURN d as from, r as rel, x as to
+                    """
+DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS  ="""
+                        MATCH (a) WHERE (a.`document:id`)=%i AND NOT (a)<-[]->()
+                        RETURN a as alone
+                    """
+
 DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
 
 BUNDLE_LABEL_NAME= "prov:Bundle"
@@ -97,8 +104,14 @@ class Neo4J(Connector):
             if db_to_node.id not in all_keys:
                 all_records.update({int(db_to_node.id): deserializer.create_record(prov_document, db_to_node)})
             #Add relations
-            if db_relation.id not in all_keys:
+            if db_relation.id not in all_keys :
                 all_records.update({int(db_relation.id): deserializer.create_relation(prov_document, db_relation)})
+
+        #get single nodes without connections to any other node
+        results = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+        for db_node in reduce(lambda x,y: x+y,results):
+            deserializer.add_namespace(db_node, prov_document)
+            all_records.update({int(db_node.id): deserializer.create_record(prov_document,db_node)})
 
 
         if prov_format is ProvDocument:
