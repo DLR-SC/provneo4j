@@ -3,7 +3,7 @@ from provstore.connectors.connector import *
 from provstore.connectors.serializer import Serializer
 class Neo4jRestSerializer(Serializer):
     def __init__(self, connection):
-        super(Serializer, self).__init__()
+        Serializer.__init__(self)
         
         if connection is None:
             raise ProvSerializerException("Neo4j rest Serializer need a connection object ")
