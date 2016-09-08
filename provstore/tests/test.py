@@ -4,8 +4,8 @@ import datetime
 from time import gmtime,strftime
 from provstore.api import Api, NotFoundException, InvalidCredentialsException, InvalidDataException, ForbiddenException
 from provstore.document import AbstractDocumentException, ImmutableDocumentException, EmptyDocumentException
-import provstore.tests.examples as examples
-
+import provstore.tests.examples as own_examples
+from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('PROVSTORE_USERNAME', 'neo4j')
 NEO4J_API_KEY = os.environ.get('PROVSTORE_API_KEY', 'neo4jneo4j')#Password
@@ -20,7 +20,7 @@ class LoggedInAPITestMixin(object):
 
 class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
     def test_basic_storage(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
@@ -30,7 +30,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_basic_get(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
         prov_document.entity("ex:string", other_attributes={"ex:name":"test"})
         prov_document.entity("ex:date",other_attributes={"ex:date":strftime("%Y%m%dT%H%M%S%Z", gmtime())})
         prov_document.wasAssociatedWith('ex:string', 'ex:date')
@@ -42,9 +42,20 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 
         stored_document.delete()
 
+
+    def test_prov_primer_example_storage(self):
+        prov_document = examples.primer_example()
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
+
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        stored_document.delete()
+
     @unittest.skip("Not supported with neo4J")
     def test_diff_auth_access(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         # Private
         stored_document = self.api.document.create(prov_document,
@@ -63,7 +74,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         self.assertEqual(document.id, stored_document.id)
 
     def test_basic_bundle_storage(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_bundle_storage")
@@ -87,7 +98,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_bundle_iteration(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_bundle_iteration")
@@ -103,7 +114,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_basic_bundle_retrieval(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document1 = self.api.document.create(prov_document,
                                                     name="test_basic_bundle_retrieval")
@@ -120,7 +131,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document2.delete()
 
     def test_non_existent_bundle(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_non_existent_bundle")
@@ -135,7 +146,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
             self.api.document.get(-1)
 
     def test_lazy_instantiation_of_props(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_lazy_instantiation_of_props")
@@ -150,7 +161,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_document_props(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document,
                                                    name="test_document_props")
@@ -179,7 +190,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
             self.api.document.name
 
     def test_abstract_exceptions(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         abstract_document = self.api.document
 
@@ -192,7 +203,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         self.assertRaises(AbstractDocumentException, abstract_document.read_prov)
 
     def test_immutable_exceptions(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document, name="test_immutable_exceptions")
 
@@ -206,7 +217,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_equality(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         stored_document = self.api.document.create(prov_document, name="test_equality")
 
@@ -215,7 +226,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document.delete()
 
     def test_invalid_name(self):
-        prov_document = examples.flat_document()
+        prov_document = own_examples.flat_document()
 
         with self.assertRaises(InvalidDataException):
             self.api.document.create(prov_document, name="")
