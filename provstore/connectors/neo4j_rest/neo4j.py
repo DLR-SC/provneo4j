@@ -119,9 +119,8 @@ class Neo4J(Connector):
         # store all database nodes in dict
         db_nodes = {}
         serializer = Neo4jRestSerializer(self._connection)
-        nodes = g.nodes()
-        if len(nodes) is 0:
-            nodes = prov_document.get_records()
+
+        nodes = prov_document.get_records(ProvElement)
         # Create nodes / for prov
         for node in nodes:
             db_nodes[node] = serializer.create_node(node)
@@ -156,13 +155,13 @@ class Neo4J(Connector):
                 serializer.add_id(db_node,doc_node.id)
             elif isinstance(graph_node,ProvElement):
                 serializer.add_id(db_node,doc_node.id)
+                serializer.add_namespaces(db_node,graph_node)
             elif isinstance(graph_node,ProvRelation):
+                serializer.add_namespaces(db_node,graph_node)
                 #don't need to add document id to the realtions
                 pass
             else:
                 raise InvalidDataException("unknown type: %s" %type(graph_node))
-
-            serializer.add_namespaces(db_node,graph_node)
 
         return doc_node.id
 
