@@ -43,11 +43,17 @@ class Api(object):
         return Document(self)
 
     def get_document_prov(self, document_id, prov_format=ProvDocument):
-        self._connector.get_document(document_id,prov_format)
+        return self._connector.get_document(document_id,prov_format)
 
 
     def get_document_meta(self, document_id):
-        raise NotImplementedException()
+        metadata = {}
+        metadata['document_name'] = "Not supported"
+        metadata['public'] = True
+        metadata['owner'] = "Not supported"
+        metadata['created_at'] = "01.01.2016 12:00:00"
+        metadata['views_count'] = 0
+        return metadata
 
 
     def post_document(self, prov_document, prov_format, name, public=False):
@@ -58,9 +64,6 @@ class Api(object):
             raise Exception("Not supported format ")
 
         return self._connector.post_document(prov_document,name)
-
-        return doc_id
-
 
 
     def add_bundle(self, document_id, prov_bundle, identifier):
