@@ -19,6 +19,16 @@ if six.integer_types[-1] not in LITERAL_XSDTYPE_MAP:
 
 class Serializer:
 
+
+    @staticmethod
+    def encode_string_value(value):
+        if type(value) is unicode:
+            return value.encode("utf8")
+        elif isinstance(value,Literal):
+            return value.value
+        elif type(value) is bool:
+            return value
+        return str(value)
     @staticmethod
     def valid_qualified_name(bundle, value):
         if value is None:

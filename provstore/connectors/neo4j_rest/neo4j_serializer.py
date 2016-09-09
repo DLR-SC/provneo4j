@@ -24,7 +24,9 @@ class Neo4jRestSerializer(Serializer):
             n.labels.add(BUNDLE_LABEL_NAME)
         elif isinstance(node, ProvElement):
             n.labels.add(str(node.get_type()))
-            n.properties = dict(map(lambda (key, value): (str(key), str(value)), node.attributes))
+            n.properties = dict(map(lambda (key, value): (Serializer.encode_string_value(key),
+                                                          Serializer.encode_string_value(value)),
+                                    node.attributes))
         else:
             raise InvalidDataException("Not supportet node class you passed %s " % type(node))
 
@@ -34,7 +36,8 @@ class Neo4jRestSerializer(Serializer):
 
     def create_relation(self, db_nodes, from_node, to_node, relation):
         # Attributes to string map
-        attributes = map(lambda (key, value): (str(key), str(value)), relation.attributes)
+        attributes = map(lambda (key, value): (Serializer.encode_string_value(key),
+                                               Serializer.encode_string_value(value)), relation.attributes)
         relationType = PROV_N_MAP[relation.get_type()]
 
         if relation.label is not None:
