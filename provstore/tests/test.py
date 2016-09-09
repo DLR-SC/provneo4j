@@ -48,7 +48,6 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
 
-        prov_document = own_examples.reformat_example(prov_document)
 
         query_document = stored_document.refresh()
         self.assertEqual(query_document.prov, prov_document)
@@ -60,7 +59,6 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
 
-        prov_document = own_examples.reformat_example(prov_document)
 
         query_document = stored_document.refresh()
         self.assertEqual(query_document.prov, prov_document)
@@ -72,7 +70,15 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         stored_document = self.api.document.create(prov_document,
                                                    name="test_basic_storage")
 
-        prov_document = own_examples.reformat_example(prov_document)
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        stored_document.delete()
+
+    def test_prov_w3c_publication_2(self):
+        prov_document = examples.w3c_publication_2()
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
 
         query_document = stored_document.refresh()
         self.assertEqual(query_document.prov, prov_document)

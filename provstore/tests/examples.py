@@ -14,18 +14,3 @@ def bundle_document():
 
     return prov.ProvDocument.deserialize(content=doc_json)
 
-def reformat_example(prov_document):
-    """
-    This function convert all possible argument values to a qualifiedName class.
-    The prov library dose not perform this action but the provstore at: provenance.ecs.soton.ac.uk output is the same
-    :param prov_document:
-    :return: prov_document
-    """
-    from provstore.connectors.deserializer import Deserializer
-    for prov_record in prov_document.get_records():
-        for key, value in prov_record.attributes:
-            qualified_name = Deserializer.valid_qualified_name(prov_document, value)
-            if qualified_name is not None:
-                prov_record._attributes[key] = set([qualified_name])
-
-    return prov_document
