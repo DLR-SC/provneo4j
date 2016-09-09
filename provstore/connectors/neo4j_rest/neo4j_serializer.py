@@ -36,8 +36,6 @@ class Neo4jRestSerializer(Serializer):
             relationName = PROV_N_MAP[relation.get_type()]
         elif relation.identifier is not None:
             relationName = str(relation.identifier)  # @todo Test this part of the code
-            attributes.append((DOC_PROPERTY_NAME_NAMESPACE_URI, relation.identifier.namescpae.uri))
-            attributes.append((DOC_PROPERTY_NAME_NAMESPACE_PREFIX, relation.identifier.namescpae.prefix))
         else:
             raise InvalidDataException(
                 "Relation is not valid. The type of the relation is not a default prov relation and has no identifier")
@@ -58,6 +56,10 @@ class Neo4jRestSerializer(Serializer):
         if isinstance(prov_record.identifier, QualifiedName):
             namespace = prov_record.identifier.namespace
             used_namespaces.update({str(namespace.prefix):namespace.uri})
+        elif isinstance(prov_record.label, QualifiedName):
+            #if it is a relation instead of a node
+            namespace = prov_record.identifier.namespace
+            used_namespaces.update({str(namespace.prefix): namespace.uri})
         else:
            logger.info("Prov record %s has no identifier"%prov_record)
 
