@@ -17,6 +17,7 @@ import logging
 DOC_PROPERTY_NAME_ID = "document:id"
 DOC_PROPERTY_NAME_LABEL = "document:label"
 DOC_RELATION_TYPE = "relation:type"
+DOC_PROPERTY_NAME_PROPERTIES_TYPES= "document:properties_types"
 DOC_PROPERTY_NAME_BUNDLES = "document:bundles"
 DOC_PROPERTY_NAME_NAMESPACE_URI = "namespace:uri"
 DOC_PROPERTY_NAME_NAMESPACE_PREFIX = "namespace:prefix"
@@ -26,7 +27,8 @@ DOC_PROPERTY_MAP = [DOC_PROPERTY_NAME_ID,
                     DOC_PROPERTY_NAME_NAMESPACE_URI,
                     DOC_PROPERTY_NAME_NAMESPACE_PREFIX,
                     DOC_PROPERTY_NAME_LABEL,
-                    DOC_RELATION_TYPE]
+                    DOC_RELATION_TYPE,
+                    DOC_PROPERTY_NAME_PROPERTIES_TYPES]
 
 DOC_GET_DOC_BY_ID = """ MATCH (d)-[r]-(x) WHERE (d.`document:id`)=%i
                         RETURN d as from, r as rel, x as to
@@ -174,8 +176,10 @@ class Neo4J(Connector):
             elif isinstance(graph_node,ProvElement):
                 serializer.add_id(db_node,doc_node.id)
                 serializer.add_namespaces(db_node,graph_node)
+                serializer.add_propety_map(db_node,graph_node)
             elif isinstance(graph_node,ProvRelation):
                 serializer.add_namespaces(db_node,graph_node)
+                serializer.add_propety_map(db_node,graph_node)
                 #don't need to add document id to the realtions
                 pass
             else:

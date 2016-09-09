@@ -1,6 +1,11 @@
 from neo4j import  *
 from provstore.connectors.connector import *
 from provstore.connectors.serializer import Serializer
+from datetime import datetime
+from prov.constants import *
+from StringIO import StringIO
+import json
+
 class Neo4jRestSerializer(Serializer):
     def __init__(self, connection):
         Serializer.__init__(self)
@@ -8,7 +13,6 @@ class Neo4jRestSerializer(Serializer):
         if connection is None:
             raise ProvSerializerException("Neo4j rest Serializer need a connection object ")
         self._connection = connection
-
 
     def create_node(self, node):
         # node is a MulitDiGrpah.Node / ProvRecord
@@ -54,6 +58,24 @@ class Neo4jRestSerializer(Serializer):
         db_to_bundle = db_nodes[to_bundle.identifier]
         db_from_node = db_nodes[from_node]
         return db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle)
+
+
+    def add_propety_map(self,db_node,prov_record):
+        if type(prov_record.attributes) is not None:
+            types ={}
+            for key,value in prov_record.attributes:
+                if key not in PROV_ATTRIBUTES:
+                    type_dic = Serializer.encode_json_representation(value)
+                    if type_dic is not None:
+                        types.update({str(key): type_dic})
+
+            io = StringIO()
+            json.dump(types, io)
+            io.getvalue()
+
+            db_node.set(DOC_PROPERTY_NAME_PROPERTIES_TYPES, io.getvalue())
+        else:
+            raise ProvSerializerException("Please provide a prov_record with attributes")
 
     def add_namespaces(self,db_node, prov_record):
         used_namespaces={}

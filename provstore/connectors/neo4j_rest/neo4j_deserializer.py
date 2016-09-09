@@ -1,15 +1,27 @@
 
 from provstore.connectors.connector import *
 from provstore.connectors.deserializer import Deserializer
-from provstore.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_RELATION_TYPE,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
+from provstore.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_PROPERTY_NAME_PROPERTIES_TYPES,DOC_RELATION_TYPE,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
 from prov.model import PROV_REC_CLS,Namespace
 from prov.constants import PROV_RECORD_IDS_MAP
-
+import json
+from StringIO import StringIO
 class Neo4JRestDeserializer(Deserializer):
 
     def get_properties_without_meta_data(self,properties):
         real_property_keys = set(properties.keys()) - set(DOC_PROPERTY_MAP)
         return filter(lambda (key, value): key in real_property_keys, properties.iteritems())
+    def get_properties_as_typed_map(self,properties, type_dic):
+
+        properties = dict(properties)
+        for key,value in properties.iteritems():
+                if key in type_dic:
+                    type = type_dic.get(key)
+                    type.update({
+                        "$": value
+                    })
+                    properties.update({key: type})
+        return properties
 
     def create_record(self,bundle,db_record):
         jc = []
@@ -28,8 +40,10 @@ class Neo4JRestDeserializer(Deserializer):
         #Remove all metda-data from the properties
 
 
+        io = StringIO(db_record.properties.get(DOC_PROPERTY_NAME_PROPERTIES_TYPES))
+        types = json.load(io)
         properties = self.get_properties_without_meta_data(db_record.properties)
-
+        properties = self.get_properties_as_typed_map(properties, types)
         #Get id for the node from the properties
         rec_id  = db_record.properties.get(DOC_PROPERTY_NAME_LABEL)
         return Deserializer.create_prov_record(bundle,rec_type,rec_id,properties)
@@ -53,8 +67,10 @@ class Neo4JRestDeserializer(Deserializer):
         # if custom relation type
             rec_id= Deserializer.valid_qualified_name(bundle, db_relation.type)
 
-
+        io = StringIO(db_relation.properties.get(DOC_PROPERTY_NAME_PROPERTIES_TYPES))
+        types = json.load(io)
         properties = self.get_properties_without_meta_data(db_relation.properties)
+        properties = self.get_properties_as_typed_map(properties,types)
         return Deserializer.create_prov_record(bundle, rec_type, rec_id, properties)
 
 
