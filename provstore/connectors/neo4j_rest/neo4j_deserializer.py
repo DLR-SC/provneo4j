@@ -1,7 +1,7 @@
 
 from provstore.connectors.connector import *
 from provstore.connectors.deserializer import Deserializer
-from provstore.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
+from provstore.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_RELATION_TYPE,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
 from prov.model import PROV_REC_CLS,Namespace
 from prov.constants import PROV_RECORD_IDS_MAP
 
@@ -37,17 +37,25 @@ class Neo4JRestDeserializer(Deserializer):
 
 
     def create_relation(self,bundle,db_relation):
-        print db_relation.type
-        rec_type = Deserializer.valid_qualified_name(bundle,db_relation.type)
+
+        db_relation_type = db_relation.properties.get(DOC_RELATION_TYPE)
+
+        if db_relation_type is None:
+            raise ProvSerializerException("Relation must provide the  %s property" %DOC_RELATION_TYPE)
+
+        rec_type = PROV_RECORD_IDS_MAP[db_relation_type]
         if rec_type is None:
-            #Normal prov namesocae
-            rec_type = PROV_RECORD_IDS_MAP[db_relation.type]
-            if rec_type is None:
-                raise InvalidDataException("No valid relation type provided the type was %s"%db_relation.type)
+            raise InvalidDataException("No valid relation type provided the type was %s"%db_relation.type)
+
+        rec_id = None
+
+        if PROV_RECORD_IDS_MAP[db_relation_type] is None:
+        # if custom relation type
+            rec_id= Deserializer.valid_qualified_name(bundle, db_relation.type)
+
 
         properties = self.get_properties_without_meta_data(db_relation.properties)
-
-        return Deserializer.create_prov_record(bundle, rec_type, None, properties)
+        return Deserializer.create_prov_record(bundle, rec_type, rec_id, properties)
 
 
     def add_namespace(self,db_node,prov_bundle):

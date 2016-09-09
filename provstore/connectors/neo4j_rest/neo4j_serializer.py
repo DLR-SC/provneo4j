@@ -31,15 +31,19 @@ class Neo4jRestSerializer(Serializer):
     def create_relation(self, db_nodes, from_node, to_node, relation):
         # Attributes to string map
         attributes = map(lambda (key, value): (str(key), str(value)), relation.attributes)
+        relationType = PROV_N_MAP[relation.get_type()]
 
-        if relation.label == None:
-            relationName = PROV_N_MAP[relation.get_type()]
+        if relation.label is not None:
+            relationName = str(relation.label)
         elif relation.identifier is not None:
-            relationName = str(relation.identifier)  # @todo Test this part of the code
+            relationName = str(relation.identifier)
+        elif relationType is not None:
+            relationName = relationType
         else:
             raise InvalidDataException(
                 "Relation is not valid. The type of the relation is not a default prov relation and has no identifier")
 
+        attributes.append((DOC_RELATION_TYPE,relationType))
         db_from_node = db_nodes[from_node]
         db_to_node = db_nodes[to_node]
 
