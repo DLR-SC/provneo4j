@@ -91,9 +91,11 @@ class Neo4J(Connector):
 
     def get_document(self,document_id,prov_format):
         results = self._connection.query(q=DOC_GET_DOC_BY_ID % document_id, returns=(Node, Relationship,Node))
-
+        results_nodes_without_relations = None
         if len(results) == 0:
-            raise NotFoundException("We can't find the document with the id %i" %document_id)
+            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+            if len(results_nodes_without_relations) == 0 :
+                raise NotFoundException("We can't find the document with the id %i" %document_id)
         prov_document = ProvDocument()
         all_records= {}
         deserializer = Neo4JRestDeserializer()
@@ -113,10 +115,12 @@ class Neo4J(Connector):
                 all_records.update({int(db_relation.id): deserializer.create_relation(prov_document, db_relation)})
 
         #get single nodes without connections to any other node
-        results = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
-        if len(results) >0:
+        if results_nodes_without_relations == None:
+            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+
+        if len(results_nodes_without_relations) >0:
             #@todo find a faster way to get all nodes without connections (With one query I tried it already but the libary don't support NULL values as return values.
-            for db_node in reduce(lambda x,y: x+y,results):
+            for db_node in reduce(lambda x,y: x+y,results_nodes_without_relations):
                 deserializer.add_namespace(db_node, prov_document)
                 all_records.update({int(db_node.id): deserializer.create_record(prov_document,db_node)})
 
