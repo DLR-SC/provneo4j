@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from copy import copy
+from prov.graph import prov_to_graph
 from prov.model import ProvDocument, QualifiedName,ProvRelation, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
 from provstore.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
@@ -15,6 +16,7 @@ import logging
 
 
 DOC_PROPERTY_NAME_ID = "document:id"
+DOC_PROPERTY_BUNDLE_ID = "document:bundleId"
 DOC_PROPERTY_NAME_LABEL = "document:label"
 DOC_RELATION_TYPE = "relation:type"
 DOC_PROPERTY_NAME_PROPERTIES_TYPES= "document:properties_types"
@@ -28,14 +30,22 @@ DOC_PROPERTY_MAP = [DOC_PROPERTY_NAME_ID,
                     DOC_PROPERTY_NAME_NAMESPACE_PREFIX,
                     DOC_PROPERTY_NAME_LABEL,
                     DOC_RELATION_TYPE,
-                    DOC_PROPERTY_NAME_PROPERTIES_TYPES]
+                    DOC_PROPERTY_NAME_PROPERTIES_TYPES,
+                    DOC_PROPERTY_BUNDLE_ID]
 
-DOC_GET_DOC_BY_ID = """ MATCH (d)-[r]-(x) WHERE (d.`document:id`)=%i
+DOC_GET_DOC_BY_ID = """ MATCH (d)-[r]-(x) WHERE not((d)-[:%s]-(x)) and (d.`document:id`)=%i
                         RETURN d as from, r as rel, x as to
                     """
+DOC_GET_BUNDLES = """ MATCH (b:`prov:Bundle`) WHERE (b.`document:id`)=%i RETURN b """
+DOC_GET_BUNDLE_BY_ID = """ MATCH (b:`prov:Bundle`) WHERE (b.`bundle:id`)=%i RETURN b """
+
 DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS  ="""
                         MATCH (a) WHERE (a.`document:id`)=%i AND NOT (a)<-[]->()
                         RETURN a as alone
+                        UNION
+                        MATCH (a)-[r:includeIn]->()
+                        WITH a,count(r) as relation_count
+                        WHERE (a.`document:id`)=%i AND relation_count=1 RETURN a as alone
                     """
 
 DOC_DELETE_BY_ID = "MATCH (d) WHERE (d.`document:id`)=%i DETACH DELETE d"
@@ -86,75 +96,101 @@ class Neo4J(Connector):
             else:
                 raise e
 
-
-
+    def get_id_from_db_node(self,dbNode):
+        return dbNode.properties.get(DOC_PROPERTY_NAME_ID)
 
     def get_document(self,document_id,prov_format):
-        results = self._connection.query(q=DOC_GET_DOC_BY_ID % document_id, returns=(Node, Relationship,Node))
+        #get basic document
+        prov_document = self.get_bundle(document_id,prov_format)
+
+
+        #get bundle nodes
+        results_bundles = self._connection.query(q=DOC_GET_BUNDLES%document_id, returns=(Node))
+
+        #get bundle content
+        if len(results_bundles) > 0:
+            for db_bundle in reduce(lambda x,y: x+y,results_bundles): #loop over flattern array
+                bundle_id = db_bundle.get(DOC_PROPERTY_BUNDLE_ID)
+                bundle_label = db_bundle.get(DOC_PROPERTY_NAME_LABEL)
+                bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label,parent_prov_document=prov_document)
+
+        return prov_document
+
+    def get_bundle(self, bundle_id, prov_format=ProvDocument, parent_prov_document=None, bundle_identifier=None):
+        results = self._connection.query(q=DOC_GET_DOC_BY_ID % (BUNDLE_RELATION_NAME, bundle_id), returns=(Node, Relationship, Node))
         results_nodes_without_relations = None
         if len(results) == 0:
-            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id,bundle_id), returns=(Node))
             if len(results_nodes_without_relations) == 0 :
-                raise NotFoundException("We can't find the document with the id %i" %document_id)
-        prov_document = ProvDocument()
+                raise NotFoundException("We can't find the document with the id %i" % bundle_id)
+
+        #create bundle or document
+        if parent_prov_document is not None:
+            bundle_document = parent_prov_document.bundle(bundle_identifier)
+        else:
+            bundle_document = ProvDocument()
+
         all_records= {}
         deserializer = Neo4JRestDeserializer()
         for db_from_node, db_relation, db_to_node in results:
-            deserializer.add_namespace(db_from_node,prov_document)
-            deserializer.add_namespace(db_to_node,prov_document)
-            deserializer.add_namespace(db_relation,prov_document)
+            deserializer.add_namespace(db_from_node,bundle_document)
+            deserializer.add_namespace(db_to_node,bundle_document)
+            deserializer.add_namespace(db_relation,bundle_document)
+
 
             all_keys = all_records.keys()
             #Add records
             if db_from_node.id not in all_keys:
-                all_records.update({int(db_from_node.id): deserializer.create_record(prov_document,db_from_node)})
+                all_records.update({int(db_from_node.id): deserializer.create_record(bundle_document,db_from_node)})
             if db_to_node.id not in all_keys:
-                all_records.update({int(db_to_node.id): deserializer.create_record(prov_document, db_to_node)})
+                all_records.update({int(db_to_node.id): deserializer.create_record(bundle_document, db_to_node)})
             #Add relations
             if db_relation.id not in all_keys :
-                all_records.update({int(db_relation.id): deserializer.create_relation(prov_document, db_relation)})
+                all_records.update({int(db_relation.id): deserializer.create_relation(bundle_document, db_relation)})
 
         #get single nodes without connections to any other node
         if results_nodes_without_relations == None:
-            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (document_id), returns=(Node))
+            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id,bundle_id), returns=(Node))
 
         if len(results_nodes_without_relations) >0:
             #@todo find a faster way to get all nodes without connections (With one query I tried it already but the libary don't support NULL values as return values.
             for db_node in reduce(lambda x,y: x+y,results_nodes_without_relations):
-                deserializer.add_namespace(db_node, prov_document)
-                all_records.update({int(db_node.id): deserializer.create_record(prov_document,db_node)})
+                deserializer.add_namespace(db_node, bundle_document)
+                all_records.update({int(db_node.id): deserializer.create_record(bundle_document,db_node)})
+
 
 
         if prov_format is ProvDocument:
-            return prov_document
+            return bundle_document
         else:
             raise NotImplementedException("Neo4j connector only supports ProvDocument format for the get_document operation")
-    def post_document(self, prov_document,name=None):
-        # creates a database entry from a prov-n document
-        # returns the saved neo4J doc
-        #
-        if len(name) == 0:
-            raise InvalidDataException("Please provide a name for the document")
+
+    def _post_bundle(self, bundle, parent_document_id=None):
         gdb = self._connection
 
         # create graph from prov doc
-        g = prov_to_graph_flattern(prov_document)
+        g = prov_to_graph_flattern(bundle)
 
         # store all database nodes in dict
         db_nodes = {}
         serializer = Neo4jRestSerializer(self._connection)
 
-        nodes = prov_document.get_records(ProvElement)
+        nodes = bundle.get_records(ProvElement)
+
+        nodes = list(set(nodes + g.nodes()))
         # Create nodes / for prov
         for node in nodes:
             db_nodes[node] = serializer.create_node(node)
-        # Create nodes for bundles
-        for bundle in prov_document.bundles:
-            db_nodes[bundle.identifier] = serializer.create_node(bundle)
 
+
+        # create bundle node
+        if parent_document_id is not None:
+            db_nodes[bundle.identifier] = serializer.create_bundle_node(bundle)
+
+        # determinate document node
         if len(nodes) is not 0:
-            #document node
-            doc_node = db_nodes.values()[0]
+            # document node
+            bundle_id = db_nodes.values()[0]
         else:
             raise InvalidDataException("Please provide a document with at least one node")
 
@@ -165,60 +201,60 @@ class Neo4J(Connector):
 
                 # interate over relations (usually only one item)
                 for key, relation in relations.iteritems():
-                    db_nodes[relation] = serializer.create_relation(db_nodes,from_node,to_node,relation)
+                    db_nodes[relation] = serializer.create_relation(db_nodes, from_node, to_node, relation)
 
-            #Create relation to the bundle node
-            for bundle in prov_document.bundles:
+            #create bundle relation if we have a parent document
+            if parent_document_id is not None:
                 for record in bundle.get_records(ProvElement):
-                    serializer.create_bundle_relation(db_nodes, record, bundle)
+                    relation = serializer.create_bundle_relation(db_nodes, record, bundle)
 
 
-        #Add meta data to each node
-        for graph_node,db_node in db_nodes.iteritems():
+        # Add meta data to each node
+        for graph_node, db_node in db_nodes.iteritems():
             if type(graph_node) is QualifiedName:
-                serializer.add_id(db_node,doc_node.id)
-            elif isinstance(graph_node,ProvElement):
-                serializer.add_id(db_node,doc_node.id)
-                serializer.add_namespaces(db_node,graph_node)
-                serializer.add_propety_map(db_node,graph_node)
-            elif isinstance(graph_node,ProvRelation):
-                serializer.add_namespaces(db_node,graph_node)
-                serializer.add_propety_map(db_node,graph_node)
-                #don't need to add document id to the realtions
+                #if bundle node
+                serializer.add_bundle_id(db_node, bundle_id.id,parent_document_id)
+                serializer.add_namespaces(db_node, graph_node)
+
+            elif isinstance(graph_node, ProvElement):
+                serializer.add_id(db_node, bundle_id.id)
+                serializer.add_namespaces(db_node, graph_node)
+                serializer.add_propety_map(db_node, graph_node)
+            elif isinstance(graph_node, ProvRelation):
+                serializer.add_namespaces(db_node, graph_node)
+                serializer.add_propety_map(db_node, graph_node)
+                # don't need to add document id to the realtions
                 pass
             else:
-                raise InvalidDataException("unknown type: %s" %type(graph_node))
+                raise InvalidDataException("unknown type: %s" % type(graph_node))
 
-        return doc_node.id
+        return db_nodes
+    def post_document(self, prov_document,name=None):
+        # creates a database entry from a prov-n document
+        # returns the saved neo4J doc
+        #
+        if len(name) == 0:
+            raise InvalidDataException("Please provide a name for the document")
+
+        #Create document and get id
+        allDbNodes = self._post_bundle(prov_document)
+        allDbNodesList = filter(lambda value: isinstance(value,Node),allDbNodes.values())
+        doc_id = self.get_id_from_db_node(allDbNodesList[0])
+
+        #create bundles
+
+        for bundle in prov_document.bundles:
+            self._post_bundle(bundle,doc_id)
+
+
+        return doc_id
 
     def delete_doc(self,document_id):
         self._connection.query(q=DOC_DELETE_BY_ID % document_id)
         return True
 
     def add_bundle(self, document_id, bundle_document, identifier):
-        bundle_doc_id = self.post_document(bundle_document, identifier)
-
-        #Set bundle ids to document
-        doc = self._connection.nodes.get(document_id)
-        bundles_ids = doc.get(DOC_PROPERTY_NAME_BUNDLES, list())
-        bundles_ids.append(bundle_doc_id)
-        doc.set(DOC_PROPERTY_NAME_BUNDLES, bundles_ids)
-
-        #create Linking Across Provenance Bundles
-        #https://www.w3.org/TR/2013/NOTE-prov-links-20130430/
-
-
-        print "start"
-        g = prov_to_graph(bundle_document)
-
-
-        for from_node, to_node, relations in g.edges_iter(data=True):
-            for key,relation in relations.iteritems():
-                print PROV_N_MAP[relation.get_type()]
-                print relation.get_type()
-                if relation.get_type() is PROV['Mention']:
-                    print "yes"
-
+        bundle_doc_id = self._post_bundle(bundle_document, parent_document_id=document_id)
 
         print "end"
 

@@ -46,9 +46,13 @@ class Neo4JRestDeserializer(Deserializer):
         properties = self.get_properties_as_typed_map(properties, types)
         #Get id for the node from the properties
         rec_id  = db_record.properties.get(DOC_PROPERTY_NAME_LABEL)
+        if rec_id == "Unknown":
+            return None
         return Deserializer.create_prov_record(bundle,rec_type,rec_id,properties)
 
-
+    def create_bundle(self,document,db_record):
+        label = db_record.properties.get(DOC_PROPERTY_NAME_LABEL)
+        return document.bundle(label)
 
     def create_relation(self,bundle,db_relation):
 
@@ -75,8 +79,11 @@ class Neo4JRestDeserializer(Deserializer):
 
 
     def add_namespace(self,db_node,prov_bundle):
-        prefixes  = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_PREFIX]
-        uris = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_URI]
+        try:
+            prefixes  = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_PREFIX]
+            uris = db_node.properties[DOC_PROPERTY_NAME_NAMESPACE_URI]
+        except KeyError:
+            return
 
         for prefix,uri in zip(prefixes,uris):
             if prefix is not None and uri is not None:

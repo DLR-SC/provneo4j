@@ -20,9 +20,7 @@ class Neo4jRestSerializer(Serializer):
 
         n = self._connection.nodes.create()
 
-        if isinstance(node, ProvBundle):
-            n.labels.add(BUNDLE_LABEL_NAME)
-        elif isinstance(node, ProvElement):
+        if isinstance(node, ProvElement):
             n.labels.add(str(node.get_type()))
             n.properties = dict(map(lambda (key, value): (Serializer.encode_string_value(key),
                                                           Serializer.encode_string_value(value)),
@@ -56,6 +54,11 @@ class Neo4jRestSerializer(Serializer):
 
         return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
+    def create_bundle_node(self, bundle):
+        n = self._connection.nodes.create()
+        n.labels.add(BUNDLE_LABEL_NAME)
+        n.set(DOC_PROPERTY_NAME_LABEL, (str(bundle.identifier)))
+        return n
 
     def create_bundle_relation(self, db_nodes, from_node, to_bundle):
         db_to_bundle = db_nodes[to_bundle.identifier]
@@ -82,7 +85,12 @@ class Neo4jRestSerializer(Serializer):
 
     def add_namespaces(self,db_node, prov_record):
         used_namespaces={}
-        if isinstance(prov_record.identifier, QualifiedName):
+
+        if isinstance(prov_record, QualifiedName):
+            #if bundle
+            namespace = prov_record.namespace
+            used_namespaces.update({str(namespace.prefix): namespace.uri})
+        elif isinstance(prov_record.identifier, QualifiedName):
             namespace = prov_record.identifier.namespace
             used_namespaces.update({str(namespace.prefix):namespace.uri})
         elif isinstance(prov_record.label, QualifiedName):
@@ -110,9 +118,14 @@ class Neo4jRestSerializer(Serializer):
                         namespace = qualified_name.namespace
                         used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
 
+        if len(used_namespaces) == 0:
+            namespace = PROV
+            used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
 
+    def add_bundle_id(self, db_node, doc_id,parent_id):
+        db_node.set(DOC_PROPERTY_NAME_ID,parent_id)
+        db_node.set(DOC_PROPERTY_BUNDLE_ID,doc_id)
     def add_id(self, db_node, doc_id):
-
         db_node.set(DOC_PROPERTY_NAME_ID, doc_id)
