@@ -92,21 +92,23 @@ class Neo4jRestSerializer(Serializer):
         else:
            logger.info("Prov record %s has no identifier"%prov_record)
 
-        for key,value in prov_record.attributes:
-            if isinstance(key,QualifiedName):
-                namespace = key.namespace
-                used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
-            else:
-               raise ProvSerializerException("Not support key type %s"%type(key))
+        if hasattr(prov_record, 'attributes'):
 
-            if isinstance(value, QualifiedName):
-                namespace = value.namespace
-                used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
-            else:
-                qualified_name = Serializer.valid_qualified_name(prov_record.bundle, value)
-                if qualified_name is not None:
-                    namespace = qualified_name.namespace
+            for key,value in prov_record.attributes:
+                if isinstance(key,QualifiedName):
+                    namespace = key.namespace
                     used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
+                else:
+                   raise ProvSerializerException("Not support key type %s"%type(key))
+
+                if isinstance(value, QualifiedName):
+                    namespace = value.namespace
+                    used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
+                else:
+                    qualified_name = Serializer.valid_qualified_name(prov_record.bundle, value)
+                    if qualified_name is not None:
+                        namespace = qualified_name.namespace
+                        used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
 
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
