@@ -9,7 +9,7 @@ from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('PROVSTORE_USERNAME', 'neo4j')
 NEO4J_API_KEY = os.environ.get('PROVSTORE_API_KEY', 'neo4jneo4j')#Password
-NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://192.168.99.100:32769/db/data/')
+NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://192.168.99.100:32772/db/data/')
 
 class LoggedInAPITestMixin(object):
     @classmethod
@@ -84,6 +84,16 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         self.assertEqual(query_document.prov, prov_document)
 
         stored_document.delete()
+
+    def test_prov_bundles1(self):
+        prov_document = examples.bundles1()
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
+
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        #stored_document.delete()
 
     def test_prov_datatypes(self):
         prov_document = examples.datatypes()
