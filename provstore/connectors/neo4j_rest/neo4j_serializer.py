@@ -32,7 +32,7 @@ class Neo4jRestSerializer(Serializer):
         return n
 
 
-    def create_relation(self, db_nodes, from_node, to_node, relation):
+    def create_relation(self, db_from_node, db_to_node, relation):
         # Attributes to string map
         attributes = map(lambda (key, value): (Serializer.encode_string_value(key),
                                                Serializer.encode_string_value(value)), relation.attributes)
@@ -49,8 +49,6 @@ class Neo4jRestSerializer(Serializer):
                 "Relation is not valid. The type of the relation is not a default prov relation and has no identifier")
 
         attributes.append((DOC_RELATION_TYPE,relationType))
-        db_from_node = db_nodes[from_node]
-        db_to_node = db_nodes[to_node]
 
         return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 

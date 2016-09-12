@@ -8,7 +8,7 @@ from provstore.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES,PROV_REC_CLS
 from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relationship
-from prov.constants import PROV_N_MAP,PROV_RECORD_IDS_MAP,PROV_ATTRIBUTES_ID_MAP,PROV_ATTRIBUTES,PROV_MEMBERSHIP,PROV_ATTR_ENTITY,PROV_ATTRIBUTE_QNAMES,PROV_ATTR_COLLECTION,XSD_ANYURI,PROV_QUALIFIEDNAME
+from prov.constants import PROV_MENTION,PROV_BUNDLE,PROV_N_MAP,PROV_ATTR_BUNDLE,PROV_ATTR_GENERAL_ENTITY,PROV_ATTR_SPECIFIC_ENTITY,PROV_RECORD_IDS_MAP,PROV_ATTRIBUTES_ID_MAP,PROV_ATTRIBUTES,PROV_MEMBERSHIP,PROV_ATTR_ENTITY,PROV_ATTRIBUTE_QNAMES,PROV_ATTR_COLLECTION,XSD_ANYURI,PROV_QUALIFIEDNAME
 from provstore.prov_to_graph import prov_to_graph_flattern
 from provstore.connectors.connector import  *
 
@@ -38,6 +38,13 @@ DOC_GET_DOC_BY_ID = """ MATCH (d)-[r]-(x) WHERE not((d)-[:%s]-(x)) and (d.`docum
                     """
 DOC_GET_BUNDLES = """ MATCH (b:`prov:Bundle`) WHERE (b.`document:id`)=%i RETURN b """
 DOC_GET_BUNDLE_BY_ID = """ MATCH (b:`prov:Bundle`) WHERE (b.`bundle:id`)=%i RETURN b """
+
+DOC_GET_METTION_OF_TARGET = """ MATCH (n:`prov:Bundle`)-[r]-(x)
+                                WHERE (n.`document:id`)=%i
+                                AND n.`document:label` = '%s'
+                                AND x.`document:label` = '%s'
+                                RETURN x
+                                LIMIT 1"""
 
 DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS  ="""
                         MATCH (a) WHERE (a.`document:id`)=%i AND NOT (a)<-[]->()
@@ -165,6 +172,43 @@ class Neo4J(Connector):
         else:
             raise NotImplementedException("Neo4j connector only supports ProvDocument format for the get_document operation")
 
+    def _post_bundle_links(self, document_id, bundle):
+
+        all_relations = bundle.get_records(ProvRelation)
+        for relation in all_relations:
+            if relation.get_type() == PROV_MENTION:
+                #only mentions are allowed to create connections between bundles
+                attr_dict = dict(relation.attributes)
+
+                #Get information for target node
+                target_bundle_label = attr_dict.get(PROV_ATTR_BUNDLE)
+                target_label = attr_dict.get(PROV_ATTR_GENERAL_ENTITY)
+
+                #query target node
+                to_node_results = self._connection.query(q=DOC_GET_METTION_OF_TARGET%(document_id,target_bundle_label,target_label), returns=(Node))
+                if len(to_node_results) !=  1:
+                    InvalidDataException("The result of this query should be 1 node but the length was %i"%len(to_node_results))
+
+                db_to_node = list(to_node_results).pop().pop()
+
+                #get information for from node
+                from_label = attr_dict.get(PROV_ATTR_SPECIFIC_ENTITY)
+                from_node_results = self._connection.query(
+                    q=DOC_GET_METTION_OF_TARGET % (document_id, bundle.identifier, from_label), returns=(Node))
+                if len(from_node_results) != 1:
+                    InvalidDataException(
+                        "The result of this query should be 1 node but the length was %i" % len(from_node_results))
+
+                db_from_node = list(from_node_results).pop().pop()
+
+                serializer = Neo4jRestSerializer(self._connection)
+                db_relation = serializer.create_relation(db_from_node,db_to_node,relation)
+                serializer.add_namespaces(db_relation , relation)
+                serializer.add_propety_map(db_relation , relation)
+
+            pass
+
+
     def _post_bundle(self, bundle, parent_document_id=None):
         gdb = self._connection
 
@@ -201,7 +245,9 @@ class Neo4J(Connector):
 
                 # interate over relations (usually only one item)
                 for key, relation in relations.iteritems():
-                    db_nodes[relation] = serializer.create_relation(db_nodes, from_node, to_node, relation)
+                    db_from_node = db_nodes[from_node]
+                    db_to_node = db_nodes[to_node]
+                    db_nodes[relation] = serializer.create_relation(db_from_node, db_to_node, relation)
 
             #create bundle relation if we have a parent document
             if parent_document_id is not None:
@@ -245,6 +291,10 @@ class Neo4J(Connector):
 
         for bundle in prov_document.bundles:
             self._post_bundle(bundle,doc_id)
+
+        #create links between bundles
+        for bundle in prov_document.bundles:
+            self._post_bundle_links(doc_id,bundle)
 
 
         return doc_id
