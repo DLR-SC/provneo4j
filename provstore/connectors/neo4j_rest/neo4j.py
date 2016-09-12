@@ -245,9 +245,10 @@ class Neo4J(Connector):
 
                 # interate over relations (usually only one item)
                 for key, relation in relations.iteritems():
-                    db_from_node = db_nodes[from_node]
-                    db_to_node = db_nodes[to_node]
-                    db_nodes[relation] = serializer.create_relation(db_from_node, db_to_node, relation)
+                    if relation.get_type() != PROV_MENTION:
+                        db_from_node = db_nodes[from_node]
+                        db_to_node = db_nodes[to_node]
+                        db_nodes[relation] = serializer.create_relation(db_from_node, db_to_node, relation)
 
             #create bundle relation if we have a parent document
             if parent_document_id is not None:
