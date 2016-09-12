@@ -40,7 +40,7 @@ def prov_to_graph_flattern(prov_document):
 
 
     g = nx.MultiDiGraph()
-    unified = prov_document.flattened().unified()
+    unified = prov_document.unified()
     node_map = dict(
         (element.identifier, element)
         for element in unified.get_records(ProvElement)
