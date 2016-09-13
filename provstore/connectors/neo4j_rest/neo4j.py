@@ -147,12 +147,16 @@ class Neo4J(Connector):
 
             all_keys = all_records.keys()
             #Add records
-            if db_from_node.id not in all_keys:
+            if db_from_node.id not in all_keys and self.get_id_from_db_node(db_from_node) == bundle_id:
+
                 all_records.update({int(db_from_node.id): deserializer.create_record(bundle_document,db_from_node)})
-            if db_to_node.id not in all_keys:
+
+            if db_to_node.id not in all_keys and self.get_id_from_db_node(db_to_node) == bundle_id:
+
                 all_records.update({int(db_to_node.id): deserializer.create_record(bundle_document, db_to_node)})
+
             #Add relations
-            if db_relation.id not in all_keys :
+            if db_relation.id not in all_keys and self.get_id_from_db_node(db_relation.start) == bundle_id :
                 all_records.update({int(db_relation.id): deserializer.create_relation(bundle_document, db_relation)})
 
         #get single nodes without connections to any other node
@@ -249,6 +253,9 @@ class Neo4J(Connector):
                         db_from_node = db_nodes[from_node]
                         db_to_node = db_nodes[to_node]
                         db_nodes[relation] = serializer.create_relation(db_from_node, db_to_node, relation)
+                    else:
+                        db_nodes[to_node].delete()
+                        del db_nodes[to_node]
 
             #create bundle relation if we have a parent document
             if parent_document_id is not None:
