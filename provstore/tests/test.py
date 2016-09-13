@@ -93,8 +93,17 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         query_document = stored_document.refresh()
         self.assertEqual(query_document.prov, prov_document)
 
-        #stored_document.delete()
+        stored_document.delete()
 
+    def test_prov_bundles2(self):
+        prov_document = examples.bundles2()
+        stored_document = self.api.document.create(prov_document,
+                                                   name="test_basic_storage")
+
+        query_document = stored_document.refresh()
+        self.assertEqual(query_document.prov, prov_document)
+
+        stored_document.delete()
     def test_prov_datatypes(self):
         prov_document = examples.datatypes()
         stored_document = self.api.document.create(prov_document,
