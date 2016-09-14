@@ -27,7 +27,6 @@ class Neo4JRestDeserializer(Deserializer):
         jc = []
         #Get type from label
         rec_type = None
-        print db_record.labels
 
         for label in iter(db_record.labels):
             label = Deserializer.valid_qualified_name(bundle, label._label)
