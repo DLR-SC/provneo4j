@@ -1,4 +1,4 @@
-provneo4j-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provstore-api) [![Build Status](https://travis-ci.org/millar/provstore-api.svg?branch=master)](https://travis-ci.org/millar/provstore-api) [![Coverage Status](https://coveralls.io/repos/millar/provstore-api/badge.png)](https://coveralls.io/r/millar/provstore-api)
+provneo4j-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/DLR-SC/provneo4j-api/badge.png)](https://coveralls.io/r/millar/provstore-api)
 =========
 
 PROV Client for the [Neo4j](https://neo4j.com/) graph database 
@@ -18,7 +18,7 @@ To use the client import the API and configure your access credentials:
 ```python
 from provneo4j.api import Api
 
-api = Api(userame="your_neo4j_username", password="your_api_key")
+api = Api(userame="your_neo4j_username", password="your_password")
 ```
 
 *Note: credentials can also be set via the `PROVNEO4J_USERNAME` and `PROVNEO4J_PASSWORD` environment variables and omitted from the initialization.*
@@ -109,4 +109,5 @@ This project is licensed under the MIT license.
 ## Contributors
 
 Sam Millar &lt;http://millar.io&gt;
+
 Stefan Bieliauskas 
