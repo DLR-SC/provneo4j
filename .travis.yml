@@ -13,6 +13,7 @@ addons:
 
 before_install:
   - if [[ $SHIPPABLE_JDK_VERSION == "oraclejdk8" ]] ; then export JAVA_HOME="/usr/lib/jvm/java-8-oracle"; export PATH="$PATH:/usr/lib/jvm/java-8-oracle/bin"; export java_path="/usr/lib/jvm/java-8-oracle/jre/bin/java"; fi
+  - echo  $java_path
   - update-alternatives --set java $java_path
   - java -version
   # install Neo4j locally:
