@@ -7,7 +7,7 @@ jdk:
   - oraclejdk7
 before_install:
   # install Neo4j locally:
-  - wget dist.neo4j.org/neo4j-community-2.2.0-unix.tar.gz
+  - wget dist.neo4j.org/neo4j-community-3.0.1-unix.tar.gz
   - tar -xzf neo4j-community-2.2.0-unix.tar.gz
   - neo4j-community-2.2.0/bin/neo4j start
   - curl -vX POST http://neo4j:neo4j@localhost:7474/user/neo4j/password -d"password=neo4jneo4j"
