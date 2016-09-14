@@ -7,9 +7,9 @@ from provstore.document import AbstractDocumentException, ImmutableDocumentExcep
 import provstore.tests.examples as own_examples
 from prov.tests import examples
 
-NEO4J_USERNAME = os.environ.get('PROVSTORE_USERNAME', 'neo4j')
-NEO4J_API_KEY = os.environ.get('PROVSTORE_API_KEY', 'neo4jneo4j')#Password
-NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://192.168.99.100:32775/db/data/')
+NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')
+NEO4J_API_KEY = os.environ.get('NEO4J_PASSWORD', 'neo4j')#Password
+NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://localhost:7474/db/data/')
 
 class LoggedInAPITestMixin(object):
     @classmethod
