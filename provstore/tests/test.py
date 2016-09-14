@@ -8,7 +8,7 @@ import provstore.tests.examples as own_examples
 from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')
-NEO4J_API_KEY = os.environ.get('NEO4J_PASSWORD', 'neo4j')#Password
+NEO4J_API_KEY = os.environ.get('NEO4J_PASSWORD', 'neo4jneo4j')#Password
 NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://localhost:7474/db/data/')
 
 class LoggedInAPITestMixin(object):
