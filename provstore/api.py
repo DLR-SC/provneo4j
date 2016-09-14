@@ -75,11 +75,11 @@ class Api(object):
 
     def get_bundles(self, document_id):
 
-        raise NotImplementedException()
+        return self._connector.get_bundles(document_id)
 
-    def get_bundle(self, document_id, bundle_id, prov_format=ProvDocument):
+    def get_bundle(self, document_id, bundle_id,prov_format=ProvDocument):
 
-        raise NotImplementedException()
+        return self._connector.get_document(bundle_id,prov_format)
 
     def delete_document(self, document_id):
         return self._connector.delete_doc(document_id)

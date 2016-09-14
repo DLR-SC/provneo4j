@@ -11,7 +11,7 @@ from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relatio
 from prov.constants import PROV_MENTION,PROV_BUNDLE,PROV_N_MAP,PROV_ATTR_BUNDLE,PROV_ATTR_GENERAL_ENTITY,PROV_ATTR_SPECIFIC_ENTITY,PROV_RECORD_IDS_MAP,PROV_ATTRIBUTES_ID_MAP,PROV_ATTRIBUTES,PROV_MEMBERSHIP,PROV_ATTR_ENTITY,PROV_ATTRIBUTE_QNAMES,PROV_ATTR_COLLECTION,XSD_ANYURI,PROV_QUALIFIEDNAME
 from provstore.prov_to_graph import prov_to_graph_flattern
 from provstore.connectors.connector import  *
-
+from datetime import datetime
 import logging
 
 
@@ -122,6 +122,24 @@ class Neo4J(Connector):
                 bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label,parent_prov_document=prov_document)
 
         return prov_document
+
+    def get_bundles(self,document_id):
+        results  = self._connection.query(q=DOC_GET_BUNDLES % document_id, returns=(Node))
+
+        transformed_results = []
+        # get bundle content
+        if len(results) > 0:
+            for db_bundle in reduce(lambda x, y: x + y, results):  #loop over flattern array
+
+                bundle_id = db_bundle.get(DOC_PROPERTY_BUNDLE_ID)
+                bundle_label = db_bundle.get(DOC_PROPERTY_NAME_LABEL)
+                transformed_results.append({
+                    "id": bundle_id,
+                    "identifier": bundle_label,
+                    "created_at": str(datetime(2012, 12, 12, 14, 7, 48))
+                })
+
+        return transformed_results
 
     def get_bundle(self, bundle_id, prov_format=ProvDocument, parent_prov_document=None, bundle_identifier=None):
         results = self._connection.query(q=DOC_GET_DOC_BY_ID % (BUNDLE_RELATION_NAME, bundle_id), returns=(Node, Relationship, Node))
