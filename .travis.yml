@@ -2,8 +2,10 @@ language: python
 python:
   - 2.7
 
-jdk:
-  - oraclejdk8
+#fix to get neo4j working
+sudo: required
+
+dist: trusty
 
 #set up database
 services:
