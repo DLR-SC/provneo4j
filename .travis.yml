@@ -13,8 +13,6 @@ addons:
 
 before_install:
   - export JAVA_HOME="/usr/lib/jvm/java-8-oracle"; export PATH="$PATH:/usr/lib/jvm/java-8-oracle/bin"; export java_path="/usr/lib/jvm/java-8-oracle/jre/bin/java"
-  - echo  $java_path
-  - update-alternatives --set java $java_path
   - java -version
   # install Neo4j locally:
   - wget dist.neo4j.org/neo4j-community-3.0.1-unix.tar.gz
