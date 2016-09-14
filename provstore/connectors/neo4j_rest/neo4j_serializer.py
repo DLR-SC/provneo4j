@@ -52,15 +52,13 @@ class Neo4jRestSerializer(Serializer):
 
         return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
-    def create_bundle_node(self, bundle):
+    def create_bundle_node(self, bundle, identifier):
         n = self._connection.nodes.create()
         n.labels.add(BUNDLE_LABEL_NAME)
-        n.set(DOC_PROPERTY_NAME_LABEL, (str(bundle.identifier)))
+        n.set(DOC_PROPERTY_NAME_LABEL, (str(identifier)))
         return n
 
-    def create_bundle_relation(self, db_nodes, from_node, to_bundle):
-        db_to_bundle = db_nodes[to_bundle.identifier]
-        db_from_node = db_nodes[from_node]
+    def create_bundle_relation(self, db_from_node, db_to_bundle):
         return db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle)
 
 

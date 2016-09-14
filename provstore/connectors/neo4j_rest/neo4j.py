@@ -213,7 +213,7 @@ class Neo4J(Connector):
             pass
 
 
-    def _post_bundle(self, bundle, parent_document_id=None):
+    def _post_bundle(self, bundle, parent_document_id=None,identifier=None):
         gdb = self._connection
 
         # create graph from prov doc
@@ -233,7 +233,12 @@ class Neo4J(Connector):
 
         # create bundle node
         if parent_document_id is not None:
-            db_nodes[bundle.identifier] = serializer.create_bundle_node(bundle)
+            if not isinstance(identifier,QualifiedName):
+                identifier = Neo4JRestDeserializer.valid_qualified_name(bundle,identifier)
+
+            else:
+                identifier = bundle.identifier
+            db_nodes[identifier] = serializer.create_bundle_node(bundle,identifier)
 
         # determinate document node
         if len(nodes) is not 0:
@@ -260,7 +265,10 @@ class Neo4J(Connector):
             #create bundle relation if we have a parent document
             if parent_document_id is not None:
                 for record in bundle.get_records(ProvElement):
-                    relation = serializer.create_bundle_relation(db_nodes, record, bundle)
+                    db_to_bundle = db_nodes[identifier]
+                    db_from_node = db_nodes[record]
+
+                    relation = serializer.create_bundle_relation(db_from_node, db_to_bundle)
 
 
         # Add meta data to each node
@@ -312,7 +320,7 @@ class Neo4J(Connector):
         return True
 
     def add_bundle(self, document_id, bundle_document, identifier):
-        bundle_doc_id = self._post_bundle(bundle_document, parent_document_id=document_id)
+        bundle_doc_id = self._post_bundle(bundle_document, parent_document_id=document_id,identifier=identifier)
 
         print "end"
 
