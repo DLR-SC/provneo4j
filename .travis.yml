@@ -24,7 +24,7 @@ before_install:
 
 # Install packages
 install:
-  - pip install -r requirements.txt
+  - python setup.py install
   - pip install coverage coveralls
 
 # Run test
