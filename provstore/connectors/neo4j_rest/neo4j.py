@@ -251,9 +251,12 @@ class Neo4J(Connector):
 
         # create bundle node
         if parent_document_id is not None:
+
+            if identifier is None:
+                identifier = bundle.identifier
+
             if not isinstance(identifier,QualifiedName):
                 identifier = Neo4JRestDeserializer.valid_qualified_name(bundle,identifier)
-
             else:
                 identifier = bundle.identifier
             db_nodes[identifier] = serializer.create_bundle_node(bundle,identifier)
