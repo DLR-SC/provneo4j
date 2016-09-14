@@ -84,11 +84,6 @@ class Neo4J(Connector):
         self._user_name = username
         self._user_password = user_password
 
-        if not self._user_name:
-            self._user_name = os.environ.get('NEO4J_USERNAME', None)
-        if not self._user_password:
-            self._user_password= os.environ.get('NEO4J_PASSWORD', None)
-
         if self._user_name is not None and self._user_password is not None:
             auth = {
                 "username": self._user_name,
@@ -106,7 +101,7 @@ class Neo4J(Connector):
     def get_id_from_db_node(self,dbNode):
         return dbNode.properties.get(DOC_PROPERTY_NAME_ID)
 
-    def get_document(self,document_id,prov_format):
+    def get_document(self,document_id,prov_format=ProvDocument):
         #get basic document
         prov_document = self.get_bundle(document_id,prov_format)
 
