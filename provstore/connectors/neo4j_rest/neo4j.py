@@ -99,7 +99,7 @@ class Neo4J(Connector):
             self._connection = GraphDatabase(self._base_url, **auth)
         except StatusException as e:
             if e.value == 401:  ##'Authorization Required'
-                raise InvalidCredentialsException()
+                raise InvalidCredentialsException("You used the username: %s and password %s "%(user_password,user_password))
             else:
                 raise e
 
