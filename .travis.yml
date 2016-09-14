@@ -13,10 +13,6 @@ before_install:
   - neo4j-community-2.2.0/bin/neo4j start
 
 
-#set up database
-services:
-  - neo4j
-
 # Install packages
 install:
   - pip install -r requirements.txt
