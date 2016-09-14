@@ -4,7 +4,7 @@ python:
 
 #fix to get neo4j working
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 before_install:
   # install Neo4j locally:
   - wget dist.neo4j.org/neo4j-community-3.0.1-unix.tar.gz
