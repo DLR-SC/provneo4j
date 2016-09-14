@@ -46,14 +46,25 @@ def prov_to_graph_flattern(prov_document):
         for element in unified.get_records(ProvElement)
     )
 
-    node_map[None] = ProvEntity(bundle=prov_document,identifier="Unknown")
-
+    unknown_count=0
     for relation in unified.get_records(ProvRelation):
         # taking the first two elements of a relation
         attr_pair_1, attr_pair_2 = relation.formal_attributes[:2]
         # only need the QualifiedName (i.e. the value of the attribute)
         qn1, qn2 = attr_pair_1[1], attr_pair_2[1]
         # only proceed if both ends of the relation exist
+
+        if not qn1:
+            unknown_count = unknown_count+1
+            identifier = "Unknown_%s"%unknown_count
+            node_map[identifier] = ProvEntity(bundle=prov_document,identifier=identifier)
+            qn1 = identifier
+
+        if not qn2:
+            unknown_count = unknown_count+1
+            identifier = "Unknown_%s"%unknown_count
+            node_map[identifier] = ProvEntity(bundle=prov_document,identifier=identifier)
+            qn2 = identifier
         try:
             if qn1 not in node_map:
                 node_map[qn1] = \
