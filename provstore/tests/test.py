@@ -61,6 +61,10 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 
 
         query_document = stored_document.refresh()
+
+        print query_document.prov.serialize(format="json")
+        print prov_document.serialize(format="json")
+
         self.assertEqual(query_document.prov, prov_document)
 
         stored_document.delete()
