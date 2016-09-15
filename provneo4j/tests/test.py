@@ -2,9 +2,9 @@ import os
 import unittest
 import datetime
 from time import gmtime,strftime
-from provstore.api import Api, NotFoundException, InvalidCredentialsException, InvalidDataException, ForbiddenException
-from provstore.document import AbstractDocumentException, ImmutableDocumentException, EmptyDocumentException
-import provstore.tests.examples as own_examples
+from provneo4j.api import Api, NotFoundException, InvalidCredentialsException, InvalidDataException, ForbiddenException
+from provneo4j.document import AbstractDocumentException, ImmutableDocumentException, EmptyDocumentException
+import provneo4j.tests.examples as own_examples
 from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')

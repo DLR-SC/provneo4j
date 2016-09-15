@@ -1,7 +1,7 @@
 
-from provstore.connectors.connector import *
-from provstore.connectors.deserializer import Deserializer
-from provstore.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_PROPERTY_NAME_PROPERTIES_TYPES,DOC_RELATION_TYPE,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
+from provneo4j.connectors.connector import *
+from provneo4j.connectors.deserializer import Deserializer
+from provneo4j.connectors.neo4j_rest.neo4j import DOC_PROPERTY_MAP,DOC_PROPERTY_NAME_PROPERTIES_TYPES,DOC_RELATION_TYPE,DOC_PROPERTY_NAME_LABEL,DOC_PROPERTY_NAME_NAMESPACE_URI,DOC_PROPERTY_NAME_NAMESPACE_PREFIX
 from prov.model import PROV_REC_CLS,Namespace
 from prov.constants import PROV_RECORD_IDS_MAP
 import json

@@ -1,4 +1,4 @@
-from provstore.bundle import Bundle
+from provneo4j.bundle import Bundle
 
 
 class BundleManager(object):
@@ -8,7 +8,7 @@ class BundleManager(object):
     This is an iterable and will iterate through all of a document's bundles.
 
     .. note::
-       Iteration is expensive, consider using :py:class:`provstore.document.Document.prov.bundles` instead!
+       Iteration is expensive, consider using :py:class:`provneo4j.document.Document.prov.bundles` instead!
 
     Example getting and adding bundles:
       >>> api = Api()
@@ -31,7 +31,7 @@ class BundleManager(object):
             self.refresh()
 
         if key not in self._bundles:
-            from provstore.api import NotFoundException
+            from provneo4j.api import NotFoundException
             raise NotFoundException()
 
         return self._bundles[key]

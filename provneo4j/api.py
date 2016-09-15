@@ -1,9 +1,9 @@
 import os
 import json
 from prov.model import ProvDocument
-from provstore.document import Document
-from provstore.connectors.neo4j_rest.neo4j import Neo4J
-from provstore.connectors.connector import *
+from provneo4j.document import Document
+from provneo4j.connectors.neo4j_rest.neo4j import Neo4J
+from provneo4j.connectors.connector import *
 
 class Api(object):
     """
@@ -13,8 +13,8 @@ class Api(object):
     objects.
 
     To create a new Api object:
-      >>> from provstore.api import Api
-      >>> api = Api(username="provstore username", api_key="api key")
+      >>> from provneo4j.api import Api
+      >>> api = Api(username=pprovneo4j api_key="api key")
 
     .. note::
        The username and api_key parameters can also be omitted in which case the client will look for

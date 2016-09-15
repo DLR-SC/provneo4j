@@ -4,13 +4,13 @@ import requests
 from copy import copy
 from prov.graph import prov_to_graph
 from prov.model import ProvDocument, QualifiedName,ProvRelation, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
-from provstore.document import Document
+from provneo4j.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES,PROV_REC_CLS
 from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relationship
 from prov.constants import PROV_MENTION,PROV_BUNDLE,PROV_N_MAP,PROV_ATTR_BUNDLE,PROV_ATTR_GENERAL_ENTITY,PROV_ATTR_SPECIFIC_ENTITY,PROV_RECORD_IDS_MAP,PROV_ATTRIBUTES_ID_MAP,PROV_ATTRIBUTES,PROV_MEMBERSHIP,PROV_ATTR_ENTITY,PROV_ATTRIBUTE_QNAMES,PROV_ATTR_COLLECTION,XSD_ANYURI,PROV_QUALIFIEDNAME
-from provstore.prov_to_graph import prov_to_graph_flattern
-from provstore.connectors.connector import  *
+from provneo4j.prov_to_graph import prov_to_graph_flattern
+from provneo4j.connectors.connector import  *
 from datetime import datetime
 import logging
 

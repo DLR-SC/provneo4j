@@ -1,5 +1,5 @@
 from prov.model import ProvDocument, QualifiedName, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
-from provstore.document import Document
+from provneo4j.document import Document
 from neo4jrestclient.client import GraphDatabase, StatusException
 from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES,PROV_REC_CLS
 from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relationship

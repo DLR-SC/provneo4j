@@ -1,5 +1,5 @@
 from prov.model import ProvDocument, parse_xsd_datetime
-from provstore.bundle_manager import BundleManager
+from provneo4j.bundle_manager import BundleManager
 
 
 # Document exceptions
@@ -29,12 +29,12 @@ class Document(object):
 
     .. note::
         This class should not be instantiated manually but should be accessed via
-        :py:meth:`provstore.api.Api.document` like so::
+        :py:meth:`provneo4j.api.Api.document` like so::
 
-          >>> from provstore.api import Api
+          >>> from provneo4j.api import Api
           >>> api = Api()
           >>> api.document
-          <provstore.document.Document at ...>
+          <provneo4j.document.Document at ...>
     """
     def __init__(self, api):
         self._api = api

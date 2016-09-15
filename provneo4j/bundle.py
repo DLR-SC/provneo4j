@@ -23,7 +23,7 @@ class Bundle(object):
     @property
     def identifier(self):
         """
-        :return: Identifier of the document, used as index on :py:class:`provstore.bundle_manager.BundleManager`
+        :return: Identifier of the document, used as index on :py:class:`provneo4j.bundle_manager.BundleManager`
         :rtype: str
         """
         return self._identifier
