@@ -1,4 +1,4 @@
-provneo4j-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/DLR-SC/provneo4j-api/badge.png)](https://coveralls.io/r/millar/provstore-api)
+provneo4j-api [![PyPI version](https://badge.fury.io/py/provstore-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/DLR-SC/provneo4j-api/badge.png)](https://coveralls.io/r/DLR-SC/provneo4j-api)
 =========
 
 PROV Client for the [Neo4j](https://neo4j.com/) graph database 
@@ -89,6 +89,14 @@ for bundle in api.document.get(148).bundles:
     bundle.prov
 ```
 
+## Unsupported features / Known issues 
+
+|  Feature | Comment  | 
+|---|---|
+| Authentication | The library only support the authentication with username / password. No public access  |
+| [Primer_example])(https://github.com/DLR-SC/provneo4j-api/issues/2)  |  The test for the primer_example from the prov library fails on the first run |
+| Public access | The library don't support the public / private access flag |
+
 
 ## Contribute
 
@@ -110,4 +118,4 @@ This project is licensed under the MIT license.
 
 Sam Millar &lt;http://millar.io&gt;
 
-Stefan Bieliauskas 
+Stefan Bieliauskas &lt;http://conts.de&gt;
