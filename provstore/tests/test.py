@@ -53,7 +53,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
         self.assertEqual(query_document.prov, prov_document)
 
         stored_document.delete()
-
+	@unittest.skip("Not supported on travis-cli")
     def test_prov__primer_example_alternate(self):
         prov_document = examples.primer_example_alternate()
         stored_document = self.api.document.create(prov_document,

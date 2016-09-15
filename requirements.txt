@@ -1,2 +1,4 @@
 prov>=1.0.0
 requests
+neo4jrestclient
+lxml
