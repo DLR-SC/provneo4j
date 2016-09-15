@@ -94,7 +94,7 @@ for bundle in api.document.get(148).bundles:
 |  Feature | Comment  | 
 |---|---|
 | Authentication | The library only support the authentication with username / password. No public access  |
-| [Primer_example])(https://github.com/DLR-SC/provneo4j-api/issues/2)  |  The test for the primer_example from the prov library fails on the first run |
+| [Primer_example](https://github.com/DLR-SC/provneo4j-api/issues/2)  |  The test for the primer_example from the prov library fails on the first run |
 | Public access | The library don't support the public / private access flag |
 
 
