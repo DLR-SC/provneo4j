@@ -2,11 +2,11 @@
 from setuptools import setup
 
 setup(name='provneo4j-api',
-    version='0.1.1',
+    version='0.2',
     description='Neo4j PROV API client',
     keywords = 'provenance prov graph neo4j',
     author='DLR, Sam Millar, Stefan Bieliauskas',
-    author_email='sam@millar.io, sb@conts.de',
+    author_email='opensource@dlr.de, sam@millar.io, sb@conts.de',
     url='https://github.com/DLR-SC/provneo4j-api',
     packages=['provneo4j', 'provneo4j.connectors', 'provneo4j.connectors.neo4j_rest', 'provneo4j.tests'],
     install_requires=[
