@@ -107,6 +107,10 @@ for bundle in api.document.get(148).bundles:
 
 This project is licensed under the MIT license.
 
+## Contact
+
+DLR, Intelligent and Distributed Systems: opensource@dlr.de
+
 ## Contributors
 
 Sam Millar &lt;http://millar.io&gt;
