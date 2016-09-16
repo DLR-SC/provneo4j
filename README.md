@@ -18,7 +18,7 @@ To use the client import the API and configure your access credentials:
 ```python
 from provneo4j.api import Api
 
-api = Api(userame="your_neo4j_username", password="your_password")
+api = Api(username="your_neo4j_username", password="your_password")
 ```
 
 *Note: credentials can also be set via the `PROVNEO4J_USERNAME` and `PROVNEO4J_PASSWORD` environment variables and omitted from the initialization.*
@@ -26,7 +26,7 @@ api = Api(userame="your_neo4j_username", password="your_password")
 For demonstrations purposes we will use the ProvDocuments given in the examples
 module, but you would use your documents instead.
 ```python
-import provstore.tests.examples as examples
+import provneo4j.tests.examples as examples
 ```
 
 #### Storing documents
@@ -102,13 +102,6 @@ for bundle in api.document.get(148).bundles:
 
 - Issue Tracker: https://github.com/DLR-SC/provneo4j-api/issues
 - Source Code: https://github.com/DLR-SC/provneo4j-api
-
-## Documentation
-
-- Available on [ReadTheDocs](http://provstore-api.readthedocs.org/en/latest/)
-
-### API
-- See the [full API reference](http://provstore-api.readthedocs.org/en/latest/provstore.html)
 
 ## License
 
