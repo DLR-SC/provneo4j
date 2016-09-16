@@ -8,13 +8,13 @@ import provneo4j.tests.examples as own_examples
 from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')
-NEO4J_API_KEY = os.environ.get('NEO4J_PASSWORD', 'neo4jneo4j')#Password
+NEO4J_API_KEY = os.environ.get('NEO4J_PASSWORD', 'neo4jneo4j') #Password
 NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://localhost:7474/db/data/')
 
 class LoggedInAPITestMixin(object):
     @classmethod
     def setUpClass(cls):
-        cls.api = Api(base_url=NEO4J_BASE_URL,username=NEO4J_USERNAME, api_key=NEO4J_API_KEY)
+        cls.api = Api(base_url=NEO4J_BASE_URL,username=NEO4J_USERNAME, password=NEO4J_PASSWORD)
         return super(LoggedInAPITestMixin, cls).setUpClass()
 
 
@@ -307,7 +307,7 @@ class ProvStoreAPITests(LoggedInAPITestMixin, unittest.TestCase):
 class ProvStoreConfigAPITests(unittest.TestCase):
     def test_invalid_credentials(self):
         with self.assertRaises(InvalidCredentialsException):
-            api = Api(username="millar", api_key="bad")
+            api = Api(username="millar", password="bad")
             api.document.get(148)
 
     @unittest.skip("Not supported with neo4J")
