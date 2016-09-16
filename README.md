@@ -1,7 +1,9 @@
 provneo4j-api [![PyPI version](https://badge.fury.io/py/provneo4j-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master)
 =========
 
-PROV Client for the [Neo4j](https://neo4j.com/) graph database 
+Client library for storing W3C [PROV](https://www.w3.org/TR/2013/NOTE-prov-overview-20130430/) provenance documents in [Neo4j](https://neo4j.com/) graph databases.
+
+This API is for Python and intended to be used with the library [prov](https://github.com/trungdong/prov).
 
 (based on [provstore-api](https://github.com/millar/provstore-api).)
 
