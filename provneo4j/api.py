@@ -7,28 +7,28 @@ from provneo4j.connectors.connector import *
 
 class Api(object):
     """
-    Main Neo4J-Prov API client object
+    Main Neo4J PROV API client object
 
     Most functions are not used directly but are instead accessed by functions of the Document, BundleManager and Bundle
     objects.
 
     To create a new Api object:
       >>> from provneo4j.api import Api
-      >>> api = Api(username=pprovneo4j api_key="api key")
+      >>> api = Api(username="your_neo4j_username" password="your_neo4j_password")
 
     .. note::
        The username and api_key parameters can also be omitted in which case the client will look for
-       **NEO4J_USERNAME** and **NEO4J_API_KEY** environment variables.
+       **NEO4J_USERNAME** and **NEO4J_PASSWORD** environment variables.
 
     """
 
     def __init__(self,
                  username=None,
-                 api_key=None,
+                 password=None,
                  base_url=None):
         self.base_url = base_url
         self._connector = Neo4J()
-        self._connector.connect(base_url=base_url, username=username, user_password=api_key)
+        self._connector.connect(base_url=base_url, username=username, user_password=password)
         self._username = username
 
     def __eq__(self, other):
