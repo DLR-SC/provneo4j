@@ -1,4 +1,5 @@
-provneo4j-api [![PyPI version](https://badge.fury.io/py/provneo4j-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master)
+provneo4j-api [![PyPI version](https://badge.fury.io/py/provneo4j-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/f6bd64091aec4c8591cf242fe7132f32/badge.svg)](https://www.quantifiedcode.com/app/project/f6bd64091aec4c8591cf242fe7132f32)
+
 =========
 
 Client library for storing W3C [PROV](https://www.w3.org/TR/2013/NOTE-prov-overview-20130430/) provenance documents in [Neo4j](https://neo4j.com/) graph databases.
