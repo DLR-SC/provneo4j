@@ -96,7 +96,7 @@ class Connector:
 
 
         """
-    def post_document(self, prov_document,name=None):
+    def post_document(self, prov_document, name=None):
         """
         Saved the document into the database
         :param prov_document: :py:class:`prov.model.ProvDocument`

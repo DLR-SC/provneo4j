@@ -37,21 +37,21 @@ class Neo4jRestSerializer(Serializer):
         # Attributes to string map
         attributes = map(lambda (key, value): (Serializer.encode_string_value(key),
                                                Serializer.encode_string_value(value)), relation.attributes)
-        relationType = PROV_N_MAP[relation.get_type()]
+        relation_type = PROV_N_MAP[relation.get_type()]
 
         if relation.label is not None:
-            relationName = str(relation.label)
+            relation_name = str(relation.label)
         elif relation.identifier is not None:
-            relationName = str(relation.identifier)
-        elif relationType is not None:
-            relationName = relationType
+            relation_name = str(relation.identifier)
+        elif relation_type is not None:
+            relation_name = relation_type
         else:
             raise InvalidDataException(
                 "Relation is not valid. The type of the relation is not a default prov relation and has no identifier")
 
-        attributes.append((DOC_RELATION_TYPE, relationType))
+        attributes.append((DOC_RELATION_TYPE, relation_type))
 
-        return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
+        return db_from_node.relationships.create(relation_name, db_to_node, **dict(attributes))
 
     def create_bundle_node(self, bundle, identifier):
         n = self._connection.nodes.create()
