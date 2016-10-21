@@ -1,7 +1,8 @@
 import logging
 
-from prov.model import QualifiedName,ProvRelation, ProvElement
+from prov.model import QualifiedName, ProvRelation, ProvElement
 from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relationship
+
 from prov.constants import PROV_MENTION, PROV_ATTR_BUNDLE, PROV_ATTR_GENERAL_ENTITY, PROV_ATTR_SPECIFIC_ENTITY
 
 from provneo4j.prov_to_graph import prov_to_graph_flattern
@@ -87,7 +88,8 @@ class Neo4J(Connector):
             self._connection = GraphDatabase(self._base_url, **auth)
         except StatusException as e:
             if e.value == 401:  # 'Authorization Required'
-                raise InvalidCredentialsException("You used the username: %s and password %s " % (user_password, user_password))
+                raise InvalidCredentialsException(
+                    "You used the username: %s and password %s " % (user_password, user_password))
             else:
                 raise e
 
@@ -103,10 +105,11 @@ class Neo4J(Connector):
 
         # get bundle content
         if len(results_bundles) > 0:
-            for db_bundle in reduce(lambda x, y: x+y, results_bundles): # loop over flattern array
+            for db_bundle in reduce(lambda x, y: x + y, results_bundles):  # loop over flattern array
                 bundle_id = db_bundle.get(DOC_PROPERTY_BUNDLE_ID)
                 bundle_label = db_bundle.get(DOC_PROPERTY_NAME_LABEL)
-                bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label, parent_prov_document=prov_document)
+                bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label,
+                                         parent_prov_document=prov_document)
 
         return prov_document
 
@@ -129,10 +132,12 @@ class Neo4J(Connector):
         return transformed_results
 
     def get_bundle(self, bundle_id, prov_format=ProvDocument, parent_prov_document=None, bundle_identifier=None):
-        results = self._connection.query(q=DOC_GET_DOC_BY_ID % (BUNDLE_RELATION_NAME, bundle_id), returns=(Node, Relationship, Node))
+        results = self._connection.query(q=DOC_GET_DOC_BY_ID % (BUNDLE_RELATION_NAME, bundle_id),
+                                         returns=(Node, Relationship, Node))
         results_nodes_without_relations = None
         if len(results) == 0:
-            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id,bundle_id), returns=(Node))
+            results_nodes_without_relations = self._connection.query(
+                q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id, bundle_id), returns=(Node))
             if len(results_nodes_without_relations) == 0:
                 raise NotFoundException("We can't find the document with the id %i" % bundle_id)
 
@@ -152,11 +157,9 @@ class Neo4J(Connector):
             all_keys = all_records.keys()
             # Add records
             if db_from_node.id not in all_keys and self.get_id_from_db_node(db_from_node) == bundle_id:
-
                 all_records.update({int(db_from_node.id): deserializer.create_record(bundle_document, db_from_node)})
 
             if db_to_node.id not in all_keys and self.get_id_from_db_node(db_to_node) == bundle_id:
-
                 all_records.update({int(db_to_node.id): deserializer.create_record(bundle_document, db_to_node)})
 
             # Add relations
@@ -165,18 +168,20 @@ class Neo4J(Connector):
 
         # get single nodes without connections to any other node
         if results_nodes_without_relations is None:
-            results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id, bundle_id), returns=(Node))
+            results_nodes_without_relations = self._connection.query(
+                q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id, bundle_id), returns=(Node))
 
         if len(results_nodes_without_relations) > 0:
             # @todo find a faster way to get all nodes without connections (With one query I tried it already but the libary don't support NULL values as return values.
-            for db_node in reduce(lambda x, y: x+y, results_nodes_without_relations):
+            for db_node in reduce(lambda x, y: x + y, results_nodes_without_relations):
                 deserializer.add_namespace(db_node, bundle_document)
                 all_records.update({int(db_node.id): deserializer.create_record(bundle_document, db_node)})
 
         if prov_format is ProvDocument:
             return bundle_document
         else:
-            raise NotImplementedException("Neo4j connector only supports ProvDocument format for the get_document operation")
+            raise NotImplementedException(
+                "Neo4j connector only supports ProvDocument format for the get_document operation")
 
     def _post_bundle_links(self, document_id, bundle):
 
@@ -191,9 +196,11 @@ class Neo4J(Connector):
                 target_label = attr_dict.get(PROV_ATTR_GENERAL_ENTITY)
 
                 # query target node
-                to_node_results = self._connection.query(q=DOC_GET_METTION_OF_TARGET % (document_id,target_bundle_label, target_label), returns=(Node))
+                to_node_results = self._connection.query(
+                    q=DOC_GET_METTION_OF_TARGET % (document_id, target_bundle_label, target_label), returns=(Node))
                 if len(to_node_results) != 1:
-                    InvalidDataException("The result of this query should be 1 node but the length was %i" % len(to_node_results))
+                    InvalidDataException(
+                        "The result of this query should be 1 node but the length was %i" % len(to_node_results))
 
                 db_to_node = list(to_node_results).pop().pop()
 

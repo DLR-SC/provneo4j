@@ -1,9 +1,7 @@
-import os
-import json
-from prov.model import ProvDocument
 from provneo4j.document import Document
 from provneo4j.connectors.neo4j_rest.neo4j import Neo4J
 from provneo4j.connectors.connector import *
+
 
 class Api(object):
     """
@@ -45,8 +43,7 @@ class Api(object):
         return Document(self)
 
     def get_document_prov(self, document_id, prov_format=ProvDocument):
-        return self._connector.get_document(document_id,prov_format)
-
+        return self._connector.get_document(document_id, prov_format)
 
     def get_document_meta(self, document_id):
         metadata = {}
@@ -57,29 +54,27 @@ class Api(object):
         metadata['views_count'] = 0
         return metadata
 
-
     def post_document(self, prov_document, prov_format, name, public=False):
 
         if prov_format == "json":
-             prov_document = ProvDocument.deserialize(content=prov_document)
+            prov_document = ProvDocument.deserialize(content=prov_document)
         else:
             raise Exception("Not supported format ")
 
-        return self._connector.post_document(prov_document,name)
-
+        return self._connector.post_document(prov_document, name)
 
     def add_bundle(self, document_id, prov_bundle, identifier):
 
         prov_document = ProvDocument.deserialize(content=prov_bundle)
-        return self._connector.add_bundle(document_id,prov_document, identifier)
+        return self._connector.add_bundle(document_id, prov_document, identifier)
 
     def get_bundles(self, document_id):
 
         return self._connector.get_bundles(document_id)
 
-    def get_bundle(self, document_id, bundle_id,prov_format=ProvDocument):
+    def get_bundle(self, document_id, bundle_id, prov_format=ProvDocument):
 
-        return self._connector.get_document(bundle_id,prov_format)
+        return self._connector.get_document(bundle_id, prov_format)
 
     def delete_document(self, document_id):
         return self._connector.delete_doc(document_id)
