@@ -1,15 +1,16 @@
-from prov.model import ProvDocument, QualifiedName, Namespace,ProvBundle,ProvElement,parse_xsd_datetime,Literal, Identifier
-from provneo4j.document import Document
-from neo4jrestclient.client import GraphDatabase, StatusException
-from prov.model import ProvDocument, PROV, DEFAULT_NAMESPACES,PROV_REC_CLS
-from neo4jrestclient.client import GraphDatabase, StatusException, Node, Relationship
-from prov.constants import PROV_N_MAP,PROV_RECORD_IDS_MAP,PROV_ATTRIBUTES_ID_MAP,PROV_ATTRIBUTES,PROV_MEMBERSHIP,PROV_ATTR_ENTITY,PROV_ATTRIBUTE_QNAMES,PROV_ATTR_COLLECTION,XSD_ANYURI,PROV_QUALIFIEDNAME
-from connector import *
 import logging
 
-logger = logging.getLogger(__name__)
-class Deserializer:
+from prov.model import parse_xsd_datetime, Literal, \
+    Identifier
+from prov.constants import PROV_ATTRIBUTES_ID_MAP, PROV_ATTRIBUTES, PROV_MEMBERSHIP, \
+    PROV_ATTR_ENTITY, PROV_ATTRIBUTE_QNAMES, PROV_ATTR_COLLECTION, XSD_ANYURI, PROV_QUALIFIEDNAME
 
+from connector import *
+
+logger = logging.getLogger(__name__)
+
+
+class Deserializer:
     @staticmethod
     def decode_json_representation(literal, bundle):
         if isinstance(literal, dict):
@@ -39,7 +40,7 @@ class Deserializer:
         return qualified_name
 
     @staticmethod
-    def create_prov_record(bundle,prov_type, prov_id, properties):
+    def create_prov_record(bundle, prov_type, prov_id, properties):
         """
 
         :param prov_type: valid prov type like prov:Entry as string
@@ -48,12 +49,13 @@ class Deserializer:
         :return: ProvRecord
         """
         # Parse attributes
-        if isinstance(properties,dict):
+        if isinstance(properties, dict):
             properties_list = properties.iteritems()
-        elif isinstance(properties,list):
+        elif isinstance(properties, list):
             properties_list = properties
         else:
-            raise ProvDeserializerException("please provide properties as list[(key,value)] or dict your provided: %s" % properties.__class__.__name__ )
+            raise ProvDeserializerException(
+                "please provide properties as list[(key,value)] or dict your provided: %s" % properties.__class__.__name__)
 
         attributes = dict()
         other_attributes = []

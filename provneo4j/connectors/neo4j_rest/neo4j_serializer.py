@@ -1,15 +1,17 @@
-from neo4j import  *
-from provneo4j.connectors.connector import *
-from provneo4j.connectors.serializer import Serializer
-from datetime import datetime
-from prov.constants import *
 from StringIO import StringIO
 import json
+
+from prov.constants import *
+
+from neo4j import *
+from provneo4j.connectors.connector import *
+from provneo4j.connectors.serializer import Serializer
+
 
 class Neo4jRestSerializer(Serializer):
     def __init__(self, connection):
         Serializer.__init__(self)
-        
+
         if connection is None:
             raise ProvSerializerException("Neo4j rest Serializer need a connection object ")
         self._connection = connection
@@ -26,11 +28,10 @@ class Neo4jRestSerializer(Serializer):
                                                           Serializer.encode_string_value(value)),
                                     node.attributes))
         else:
-            raise InvalidDataException("Not supportet node class you passed %s " % type(node))
+            raise InvalidDataException("Not supported node class you passed %s " % type(node))
 
         n.set(DOC_PROPERTY_NAME_LABEL, (str(node.identifier)))
         return n
-
 
     def create_relation(self, db_from_node, db_to_node, relation):
         # Attributes to string map
@@ -61,10 +62,9 @@ class Neo4jRestSerializer(Serializer):
     def create_bundle_relation(self, db_from_node, db_to_bundle):
         return db_from_node.relationships.create(BUNDLE_RELATION_NAME, db_to_bundle)
 
-
-    def add_propety_map(self,db_node,prov_record):
+    def add_propety_map(self, db_node, prov_record):
         if type(prov_record.attributes) is not None:
-            types ={}
+            types = {}
             for key,value in prov_record.attributes:
                 if key not in PROV_ATTRIBUTES:
                     type_dic = Serializer.encode_json_representation(value)
@@ -80,30 +80,30 @@ class Neo4jRestSerializer(Serializer):
             raise ProvSerializerException("Please provide a prov_record with attributes")
 
     def add_namespaces(self,db_node, prov_record):
-        used_namespaces={}
+        used_namespaces = {}
 
         if isinstance(prov_record, QualifiedName):
-            #if bundle
+            # if bundle
             namespace = prov_record.namespace
             used_namespaces.update({str(namespace.prefix): namespace.uri})
         elif isinstance(prov_record.identifier, QualifiedName):
             namespace = prov_record.identifier.namespace
-            used_namespaces.update({str(namespace.prefix):namespace.uri})
+            used_namespaces.update({str(namespace.prefix): namespace.uri})
         elif isinstance(prov_record.label, QualifiedName):
-            #if it is a relation instead of a node
+            # if it is a relation instead of a node
             namespace = prov_record.identifier.namespace
             used_namespaces.update({str(namespace.prefix): namespace.uri})
         else:
-           logger.info("Prov record %s has no identifier"%prov_record)
+           logger.info("Prov record %s has no identifier" % prov_record)
 
         if hasattr(prov_record, 'attributes'):
 
             for key,value in prov_record.attributes:
-                if isinstance(key,QualifiedName):
+                if isinstance(key, QualifiedName):
                     namespace = key.namespace
                     used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
                 else:
-                   raise ProvSerializerException("Not support key type %s"%type(key))
+                   raise ProvSerializerException("Not support key type %s" % type(key))
 
                 if isinstance(value, QualifiedName):
                     namespace = value.namespace
@@ -117,11 +117,12 @@ class Neo4jRestSerializer(Serializer):
         if len(used_namespaces) == 0:
             namespace = PROV
             used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
-        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI,used_namespaces.values())
-        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX,used_namespaces.keys())
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI, used_namespaces.values())
+        db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX, used_namespaces.keys())
 
     def add_bundle_id(self, db_node, doc_id,parent_id):
-        db_node.set(DOC_PROPERTY_NAME_ID,parent_id)
-        db_node.set(DOC_PROPERTY_BUNDLE_ID,doc_id)
+        db_node.set(DOC_PROPERTY_NAME_ID, parent_id)
+        db_node.set(DOC_PROPERTY_BUNDLE_ID, doc_id)
+
     def add_id(self, db_node, doc_id):
         db_node.set(DOC_PROPERTY_NAME_ID, doc_id)
