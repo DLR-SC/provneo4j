@@ -49,7 +49,7 @@ class Neo4jRestSerializer(Serializer):
             raise InvalidDataException(
                 "Relation is not valid. The type of the relation is not a default prov relation and has no identifier")
 
-        attributes.append((DOC_RELATION_TYPE,relationType))
+        attributes.append((DOC_RELATION_TYPE, relationType))
 
         return db_from_node.relationships.create(relationName, db_to_node, **dict(attributes))
 
@@ -65,7 +65,7 @@ class Neo4jRestSerializer(Serializer):
     def add_propety_map(self, db_node, prov_record):
         if type(prov_record.attributes) is not None:
             types = {}
-            for key,value in prov_record.attributes:
+            for key, value in prov_record.attributes:
                 if key not in PROV_ATTRIBUTES:
                     type_dic = Serializer.encode_json_representation(value)
                     if type_dic is not None:
@@ -79,7 +79,7 @@ class Neo4jRestSerializer(Serializer):
         else:
             raise ProvSerializerException("Please provide a prov_record with attributes")
 
-    def add_namespaces(self,db_node, prov_record):
+    def add_namespaces(self, db_node, prov_record):
         used_namespaces = {}
 
         if isinstance(prov_record, QualifiedName):
@@ -94,16 +94,16 @@ class Neo4jRestSerializer(Serializer):
             namespace = prov_record.identifier.namespace
             used_namespaces.update({str(namespace.prefix): namespace.uri})
         else:
-           logger.info("Prov record %s has no identifier" % prov_record)
+            logger.info("Prov record %s has no identifier" % prov_record)
 
         if hasattr(prov_record, 'attributes'):
 
-            for key,value in prov_record.attributes:
+            for key, value in prov_record.attributes:
                 if isinstance(key, QualifiedName):
                     namespace = key.namespace
                     used_namespaces.update({str(namespace.prefix): str(namespace.uri)})
                 else:
-                   raise ProvSerializerException("Not support key type %s" % type(key))
+                    raise ProvSerializerException("Not support key type %s" % type(key))
 
                 if isinstance(value, QualifiedName):
                     namespace = value.namespace
@@ -120,7 +120,7 @@ class Neo4jRestSerializer(Serializer):
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_URI, used_namespaces.values())
         db_node.set(DOC_PROPERTY_NAME_NAMESPACE_PREFIX, used_namespaces.keys())
 
-    def add_bundle_id(self, db_node, doc_id,parent_id):
+    def add_bundle_id(self, db_node, doc_id, parent_id):
         db_node.set(DOC_PROPERTY_NAME_ID, parent_id)
         db_node.set(DOC_PROPERTY_BUNDLE_ID, doc_id)
 
