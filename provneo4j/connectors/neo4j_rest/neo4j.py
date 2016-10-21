@@ -91,8 +91,8 @@ class Neo4J(Connector):
             else:
                 raise e
 
-    def get_id_from_db_node(self, dbNode):
-        return dbNode.properties.get(DOC_PROPERTY_NAME_ID)
+    def get_id_from_db_node(self, db_node):
+        return db_node.properties.get(DOC_PROPERTY_NAME_ID)
 
     def get_document(self, document_id, prov_format=ProvDocument):
         # get basic document
@@ -103,10 +103,10 @@ class Neo4J(Connector):
 
         # get bundle content
         if len(results_bundles) > 0:
-            for db_bundle in reduce(lambda x,y: x+y,results_bundles): #loop over flattern array
+            for db_bundle in reduce(lambda x, y: x+y, results_bundles): # loop over flattern array
                 bundle_id = db_bundle.get(DOC_PROPERTY_BUNDLE_ID)
                 bundle_label = db_bundle.get(DOC_PROPERTY_NAME_LABEL)
-                bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label,parent_prov_document=prov_document)
+                bundle = self.get_bundle(bundle_id=bundle_id, bundle_identifier=bundle_label, parent_prov_document=prov_document)
 
         return prov_document
 
@@ -164,7 +164,7 @@ class Neo4J(Connector):
                 all_records.update({int(db_relation.id): deserializer.create_relation(bundle_document, db_relation)})
 
         # get single nodes without connections to any other node
-        if results_nodes_without_relations == None:
+        if results_nodes_without_relations is None:
             results_nodes_without_relations = self._connection.query(q=DOC_GET_DOC_BY_ID_WITHOUT_CONNECTIONS % (bundle_id, bundle_id), returns=(Node))
 
         if len(results_nodes_without_relations) > 0:
@@ -191,7 +191,7 @@ class Neo4J(Connector):
                 target_label = attr_dict.get(PROV_ATTR_GENERAL_ENTITY)
 
                 # query target node
-                to_node_results = self._connection.query(q=DOC_GET_METTION_OF_TARGET%(document_id,target_bundle_label, target_label), returns=(Node))
+                to_node_results = self._connection.query(q=DOC_GET_METTION_OF_TARGET % (document_id,target_bundle_label, target_label), returns=(Node))
                 if len(to_node_results) != 1:
                     InvalidDataException("The result of this query should be 1 node but the length was %i" % len(to_node_results))
 
@@ -302,9 +302,9 @@ class Neo4J(Connector):
             raise InvalidDataException("Please provide a name for the document")
 
         # Create document and get id
-        allDbNodes = self._post_bundle(prov_document)
-        allDbNodesList = filter(lambda value: isinstance(value,Node), allDbNodes.values())
-        doc_id = self.get_id_from_db_node(allDbNodesList[0])
+        all_db_nodes = self._post_bundle(prov_document)
+        all_db_nodes_list = filter(lambda value: isinstance(value, Node), all_db_nodes.values())
+        doc_id = self.get_id_from_db_node(all_db_nodes_list[0])
 
         # create bundles
 
@@ -322,11 +322,6 @@ class Neo4J(Connector):
         return True
 
     def add_bundle(self, document_id, bundle_document, identifier):
-        bundle_doc_id = self._post_bundle(bundle_document, parent_document_id=document_id,identifier=identifier)
+        bundle_doc_id = self._post_bundle(bundle_document, parent_document_id=document_id, identifier=identifier)
 
         print "end"
-
-
-
-
-
