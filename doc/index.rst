@@ -1,25 +1,25 @@
-.. provserver-api documentation master file, created by
+.. provneo4j-api documentation master file, created by
    sphinx-quickstart on Sun Jul 20 12:50:01 2014.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-provstore-api
+provneo4j-api
 ==========================================
 
-provstore-api is a python API client for `ProvStore <https://provenance.ecs.soton.ac.uk/store/>`_.
+provneo4j-api is a Python client for storing PROV documents in Neo4j.
 
 Installation
 ------------
 
 Install by running::
 
-    pip install provstore-api
+    pip install provneo4j-api
 
 Contribute
 ----------
 
-- Issue Tracker: `GitHub issues <https://github.com/millar/provstore-api/issues>`_.
-- Source Code: `GitHub <https://github.com/millar/provstore-api>`_.
+- Issue Tracker: `GitHub issues <https://github.com/DLR-SC/provneo4j-api/issues>`_.
+- Source Code: `GitHub <https://github.com/DLR-SC/provneo4j-api>`_.
 
 API Documentation
 -----------------
