@@ -21,7 +21,7 @@ class Neo4jRestSerializer(Serializer):
         n = self._connection.nodes.create()
 
         if isinstance(node, ProvElement):
-            n.labels.add(str(node.get_type()))
+            n.labels.add(str(node.get_type().localpart))
             n.properties = dict(map(lambda (key, value): (Serializer.encode_string_value(key),
                                                           Serializer.encode_string_value(value)),
                                     node.attributes))

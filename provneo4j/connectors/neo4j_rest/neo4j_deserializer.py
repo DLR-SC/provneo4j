@@ -29,7 +29,7 @@ class Neo4JRestDeserializer(Deserializer):
         rec_type = None
 
         for label in iter(db_record.labels):
-            label = Deserializer.valid_qualified_name(bundle, label._label)
+            label = Deserializer.valid_qualified_name(bundle, "prov:{}".format(label._label))
             if label in PROV_REC_CLS:
                 rec_type = label
 
