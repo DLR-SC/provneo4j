@@ -1,34 +1,34 @@
-provstore package
+provneo4j package
 =================
 
-provstore.api module
+provneo4j.api module
 --------------------
 
-.. automodule:: provstore.api
+.. automodule:: provneo4j.api
     :members:
     :undoc-members:
     :show-inheritance:
 
-provstore.bundle module
+provneo4j.bundle module
 -----------------------
 
-.. automodule:: provstore.bundle
+.. automodule:: provneo4j.bundle
     :members:
     :undoc-members:
     :show-inheritance:
 
-provstore.bundle_manager module
+provneo4j.bundle_manager module
 -------------------------------
 
-.. automodule:: provstore.bundle_manager
+.. automodule:: provneo4j.bundle_manager
     :members:
     :undoc-members:
     :show-inheritance:
 
-provstore.document module
+provneo4j.document module
 -------------------------
 
-.. automodule:: provstore.document
+.. automodule:: provneo4j.document
     :members:
     :undoc-members:
     :show-inheritance:

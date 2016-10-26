@@ -4,4 +4,4 @@
 .. toctree::
    :maxdepth: 4
 
-   provstore
+   provneo4j

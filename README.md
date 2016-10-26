@@ -1,16 +1,22 @@
-provneo4j-api [![PyPI version](https://badge.fury.io/py/provneo4j-api.svg)](http://badge.fury.io/py/provneo4j-api) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master)
+[![PyPI version](https://badge.fury.io/py/provneo4j.svg)](http://badge.fury.io/py/provneo4j) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/f6bd64091aec4c8591cf242fe7132f32/badge.svg)](https://www.quantifiedcode.com/app/project/f6bd64091aec4c8591cf242fe7132f32)
+
+provneo4j
 =========
 
-PROV Client for the [Neo4j](https://neo4j.com/) graph database 
+Client library for storing W3C [PROV](https://www.w3.org/TR/2013/NOTE-prov-overview-20130430/) provenance documents in [Neo4j](https://neo4j.com/) graph databases.
+
+This API is for Python and intended to be used with the library [prov](https://github.com/trungdong/prov).
 
 (based on [provstore-api](https://github.com/millar/provstore-api).)
+
+Read the documentation: [provneo4j.readthedocs.io](http://provneo4j.readthedocs.io/en/latest/)
 
 ## Installation
 ```bash
 pip install provneo4j-api
 ```
 
-You can view [provneo4j-api on PyPi's package index](https://pypi.python.org/pypi/provneo4j-api/)
+You can view [provneo4j on PyPi's package index](https://pypi.python.org/pypi/provneo4j/)
 ## Usage
 
 To use the client import the API and configure your access credentials:
@@ -18,7 +24,7 @@ To use the client import the API and configure your access credentials:
 ```python
 from provneo4j.api import Api
 
-api = Api(userame="your_neo4j_username", password="your_password")
+api = Api(username="your_neo4j_username", password="your_password")
 ```
 
 *Note: credentials can also be set via the `PROVNEO4J_USERNAME` and `PROVNEO4J_PASSWORD` environment variables and omitted from the initialization.*
@@ -26,7 +32,7 @@ api = Api(userame="your_neo4j_username", password="your_password")
 For demonstrations purposes we will use the ProvDocuments given in the examples
 module, but you would use your documents instead.
 ```python
-import provstore.tests.examples as examples
+import provneo4j.tests.examples as examples
 ```
 
 #### Storing documents
@@ -94,25 +100,22 @@ for bundle in api.document.get(148).bundles:
 |  Feature | Comment  | 
 |---|---|
 | Authentication | The library only support the authentication with username / password. No public access  |
-| [Primer_example](https://github.com/DLR-SC/provneo4j-api/issues/2)  |  The test for the primer_example from the prov library fails on the first run |
+| [Primer_example](https://github.com/DLR-SC/provneo4j/issues/2)  |  The test for the primer_example from the prov library fails on the first run |
 | Public access | The library don't support the public / private access flag |
 
 
 ## Contribute
 
-- Issue Tracker: https://github.com/DLR-SC/provneo4j-api/issues
-- Source Code: https://github.com/DLR-SC/provneo4j-api
-
-## Documentation
-
-- Available on [ReadTheDocs](http://provstore-api.readthedocs.org/en/latest/)
-
-### API
-- See the [full API reference](http://provstore-api.readthedocs.org/en/latest/provstore.html)
+- Issue Tracker: https://github.com/DLR-SC/provneo4j/issues
+- Source Code: https://github.com/DLR-SC/provneo4j
 
 ## License
 
 This project is licensed under the MIT license.
+
+## Contact
+
+DLR, Intelligent and Distributed Systems: opensource@dlr.de
 
 ## Contributors
 

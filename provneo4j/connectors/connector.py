@@ -1,4 +1,3 @@
-import abc
 from prov.model import ProvDocument
 
 class ConnectorException(Exception):
@@ -36,8 +35,10 @@ class DocumentInvalidException(ConnectorException):
 class NotImplementedException(ConnectorException):
     pass
 
+
 class ProvDeserializerException(ConnectorException):
     pass
+
 
 class ProvSerializerException(ConnectorException):
     pass
@@ -57,8 +58,7 @@ class Connector:
         """
         raise NotImplementedError("Please implement the method 'connect' in your connector class")
 
-
-    def get_document(self,document_id,prov_format=ProvDocument):
+    def get_document(self, document_id, prov_format=ProvDocument):
         """
         Get the document from the database
         :param document_id: <int> the id of the document
@@ -79,10 +79,9 @@ class Connector:
         """
         raise NotImplementedError("Please implement the method 'get_bundle' in your connector class")
 
-
     def get_bundles(self, document_id):
         """
-        Get a list of the containing bundels
+        Get a list of the containing bundles
         :param document_id: <int> the id of the document
         :return: <List()> A list of bundles with meta information
 
@@ -97,7 +96,7 @@ class Connector:
 
 
         """
-    def post_document(self,prov_document,name=None):
+    def post_document(self, prov_document, name=None):
         """
         Saved the document into the database
         :param prov_document: :py:class:`prov.model.ProvDocument`
@@ -124,4 +123,3 @@ class Connector:
         :return:<bool>
         """
         raise NotImplementedError("Please implement the method 'post_document' in your connector class")
-

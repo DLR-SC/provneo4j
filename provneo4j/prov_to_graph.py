@@ -38,7 +38,6 @@ def prov_to_graph_flattern(prov_document):
     convert.
     """
 
-
     g = nx.MultiDiGraph()
     unified = prov_document.unified()
     node_map = dict(
@@ -46,7 +45,7 @@ def prov_to_graph_flattern(prov_document):
         for element in unified.get_records(ProvElement)
     )
 
-    unknown_count=0
+    unknown_count = 0
     for relation in unified.get_records(ProvRelation):
         # taking the first two elements of a relation
         attr_pair_1, attr_pair_2 = relation.formal_attributes[:2]
@@ -55,15 +54,15 @@ def prov_to_graph_flattern(prov_document):
         # only proceed if both ends of the relation exist
 
         if not qn1:
-            unknown_count = unknown_count+1
-            identifier = "Unknown_%s"%unknown_count
-            node_map[identifier] = ProvEntity(bundle=prov_document,identifier=identifier)
+            unknown_count = unknown_count + 1
+            identifier = "Unknown_%s" % unknown_count
+            node_map[identifier] = ProvEntity(bundle=prov_document, identifier=identifier)
             qn1 = identifier
 
         if not qn2:
-            unknown_count = unknown_count+1
-            identifier = "Unknown_%s"%unknown_count
-            node_map[identifier] = ProvEntity(bundle=prov_document,identifier=identifier)
+            unknown_count = unknown_count + 1
+            identifier = "Unknown_%s" % unknown_count
+            node_map[identifier] = ProvEntity(bundle=prov_document, identifier=identifier)
             qn2 = identifier
         try:
             if qn1 not in node_map:
