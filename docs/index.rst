@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-provneo4j-api
+provneo4j
 ==========================================
 
-provneo4j-api is a Python client for storing `PROV <https://www.w3.org/TR/2013/NOTE-prov-overview-20130430/>`_ 
+provneo4j is a Python client for storing `PROV <https://www.w3.org/TR/2013/NOTE-prov-overview-20130430/>`_ 
 documents in `Neo4j <https://neo4j.com/>`_.
 
 This library used the Python library `prov <https://github.com/trungdong/prov>`_.
@@ -16,8 +16,7 @@ Installation
 
 Install by running::
 
-    pip install provneo4j-api
-
+    pip install provneo4j
 
 Usage
 -----
@@ -57,8 +56,8 @@ Unsupported features and known issues
 Contribute
 ----------
 
-- Issue Tracker: `GitHub issues <https://github.com/DLR-SC/provneo4j-api/issues>`_.
-- Source Code: `GitHub <https://github.com/DLR-SC/provneo4j-api>`_.
+- Issue Tracker: `GitHub issues <https://github.com/DLR-SC/provneo4j/issues>`_.
+- Source Code: `GitHub <https://github.com/DLR-SC/provneo4j>`_.
 
 API Documentation
 -----------------

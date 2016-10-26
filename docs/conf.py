@@ -50,7 +50,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'provneo4j-api'
+project = u'provneo4j'
 copyright = u'2016, German Aerospace Center (DLR)'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -203,7 +203,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'provneo4j-api.tex', u'provneo4j-api Documentation',
+  ('index', 'provneo4j.tex', u'provneo4j Documentation',
    u'German Aerospace Center (DLR)', 'manual'),
 ]
 
@@ -233,7 +233,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'provneo4j-api', u'provneo4j-api Documentation',
+    ('index', 'provneo4j', u'provneo4j Documentation',
      [u'German Aerospace Center (DLR)'], 1)
 ]
 
@@ -247,8 +247,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'provneo4j-api', u'provneo4j-api Documentation',
-   u'German Aerospace Center (DLR)', 'provneo4j-api', 'One line description of project.',
+  ('index', 'provneo4j', u'provneo4j Documentation',
+   u'German Aerospace Center (DLR)', 'provneo4j', 'One line description of project.',
    'Miscellaneous'),
 ]
 
