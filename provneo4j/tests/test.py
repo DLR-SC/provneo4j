@@ -9,12 +9,13 @@ from prov.tests import examples
 
 NEO4J_USERNAME = os.environ.get('NEO4J_USERNAME', 'neo4j')
 NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD', 'neo4jneo4j') #Password
-NEO4J_BASE_URL =  os.environ.get('NEO4J_BASE_URL', 'http://localhost:7474/db/data/')
+NEO4J_HOST =  os.environ.get('NEO4J_BASE_URL', '192.168.99.100')
+NEO4J_BOLT_PORT =  os.environ.get('NEO4J_BOLT_PORT', '7687')
 
 class LoggedInAPITestMixin(object):
     @classmethod
     def setUpClass(cls):
-        cls.api = Api(base_url=NEO4J_BASE_URL,username=NEO4J_USERNAME, password=NEO4J_PASSWORD)
+        cls.api = Api(host=NEO4J_HOST,bolt_port=NEO4J_BOLT_PORT,username=NEO4J_USERNAME, password=NEO4J_PASSWORD)
         return super(LoggedInAPITestMixin, cls).setUpClass()
 
 
