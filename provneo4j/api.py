@@ -1,6 +1,51 @@
 from provneo4j.document import Document
-from provneo4j.connectors.neo4j_rest.neo4j import Neo4J
-from provneo4j.connectors.connector import *
+from provdbconnector.provDb import ProvDb
+from provdbconnector import Neo4jAdapter
+from prov.model import ProvDocument
+
+
+class ConnectorException(Exception):
+    pass
+
+
+class NotFoundException(ConnectorException):
+    pass
+
+
+class RequestTimeoutException(ConnectorException):
+    pass
+
+
+class InvalidCredentialsException(ConnectorException):
+    pass
+
+
+class ForbiddenException(ConnectorException):
+    pass
+
+
+class InvalidDataException(ConnectorException):
+    pass
+
+
+class UnprocessableException(ConnectorException):
+    pass
+
+
+class DocumentInvalidException(ConnectorException):
+    pass
+
+
+class NotImplementedException(ConnectorException):
+    pass
+
+
+class ProvDeserializerException(ConnectorException):
+    pass
+
+
+class ProvSerializerException(ConnectorException):
+    pass
 
 
 class Api(object):
@@ -23,17 +68,21 @@ class Api(object):
     def __init__(self,
                  username=None,
                  password=None,
-                 base_url=None):
-        self.base_url = base_url
-        self._connector = Neo4J()
-        self._connector.connect(base_url=base_url, username=username, user_password=password)
+                 host=None,
+                 bolt_port=7687):
+        self.host = host
+        self.auth_info = {"user_name": username,
+                     "user_password": password,
+                     "host": host + ":" + bolt_port
+                     }
+        self._connector = ProvDb(adapter=Neo4jAdapter,auth_info=self.auth_info)
         self._username = username
 
     def __eq__(self, other):
         if not isinstance(other, Api):
             return False
 
-        return self.base_url == other.base_url
+        return self.auth_info == other.auth_info
 
     def __ne__(self, other):
         return not self == other
@@ -43,7 +92,11 @@ class Api(object):
         return Document(self)
 
     def get_document_prov(self, document_id, prov_format=ProvDocument):
-        return self._connector.get_document(document_id, prov_format)
+
+        if prov_format is ProvDocument:
+            return self._connector.get_document_as_prov(document_id)
+        elif prov_format is "json":
+            return self._connector.get_document_as_json(document_id)
 
     def get_document_meta(self, document_id):
         metadata = {}
@@ -57,24 +110,26 @@ class Api(object):
     def post_document(self, prov_document, prov_format, name, public=False):
 
         if prov_format == "json":
-            prov_document = ProvDocument.deserialize(content=prov_document)
+            return self._connector.create_document_from_json(prov_document)
         else:
             raise Exception("Not supported format ")
 
-        return self._connector.post_document(prov_document, name)
-
     def add_bundle(self, document_id, prov_bundle, identifier):
 
-        prov_document = ProvDocument.deserialize(content=prov_bundle)
-        return self._connector.add_bundle(document_id, prov_document, identifier)
+        #prov_document = ProvDocument.deserialize(content=prov_bundle)
+        #return self._connector.add_bundle(document_id, prov_document, identifier)
+        pass
 
     def get_bundles(self, document_id):
 
-        return self._connector.get_bundles(document_id)
+        #return self._connector.get_bundles(document_id)
+        pass
 
     def get_bundle(self, document_id, bundle_id, prov_format=ProvDocument):
 
-        return self._connector.get_document(bundle_id, prov_format)
+        #return self._connector.get_document(bundle_id, prov_format)
+        pass
 
     def delete_document(self, document_id):
-        return self._connector.delete_doc(document_id)
+        #return self._connector.delete_doc(document_id)
+        pass
