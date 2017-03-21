@@ -13,10 +13,10 @@ Read the documentation: [provneo4j.readthedocs.io](http://provneo4j.readthedocs.
 
 ## Installation
 ```bash
-pip install provneo4j-api
+pip install provneo4j
 ```
 
-You can view [provneo4j on PyPi's package index](https://pypi.python.org/pypi/provneo4j/)
+You can view [on PyPi's package index](https://pypi.python.org/pypi/provneo4j/)
 ## Usage
 
 To use the client import the API and configure your access credentials:
