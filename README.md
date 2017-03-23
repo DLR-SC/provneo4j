@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/provneo4j.svg)](http://badge.fury.io/py/provneo4j) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j-api.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j-api) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/f6bd64091aec4c8591cf242fe7132f32/badge.svg)](https://www.quantifiedcode.com/app/project/f6bd64091aec4c8591cf242fe7132f32)
+[![PyPI version](https://badge.fury.io/py/provneo4j.svg)](http://badge.fury.io/py/provneo4j) [![Build Status](https://travis-ci.org/DLR-SC/provneo4j.svg?branch=master)](https://travis-ci.org/DLR-SC/provneo4j) [![Coverage Status](https://coveralls.io/repos/github/DLR-SC/provneo4j-api/badge.svg?branch=master)](https://coveralls.io/github/DLR-SC/provneo4j-api?branch=master) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/f6bd64091aec4c8591cf242fe7132f32/badge.svg)](https://www.quantifiedcode.com/app/project/f6bd64091aec4c8591cf242fe7132f32)
 
 provneo4j
 =========
